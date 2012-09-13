@@ -82,5 +82,7 @@ https://github.com/rrafal/django-navigation/wiki
 django-navigation is a very new project. It surely has some bugs. If you find any, please report.
 There are some features that I'd like to add to the project. If you have any too, make a request.
 
+I'm rather new to django. If you have any suggestions for this project, please submit them to me.
+
 
 
