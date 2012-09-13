@@ -179,7 +179,10 @@ class Sitemap(models.Model):
     
     
     def _get_source(self):
-        return base.site.get_sitemap(self.slug)    
+        for info in get_sitemap_info_list():
+            if info.slug == self.slug:
+                return info
+        raise ObjectDoesNotExist("Sitemap Info not found.")    
     
     def __unicode__(self):
         return _(self.slug)

@@ -60,6 +60,13 @@ MEDIA_ROOT = os.path.join(PROJECT_DIR, "media")
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
 MEDIA_URL = '/media/'
 
+
+NAVIGATION_SITEMAPS = (
+    'navigation.base.FlatPageSitemapInfo',
+#    'navigation.base.CMSSitemapInfo',
+)
+            
+
 ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 # Absolute path to the directory static files should be collected to.

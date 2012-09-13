@@ -7,7 +7,7 @@ class SitemapInfoTest(TestCase):
     
 
     def test_custom_sitemap(self):
-        sitemap_info = MySitemapInfo('test')
+        sitemap_info = MySitemapInfo()
         sitemap_info.add_item({'location': '/', 'title':'Welcome'})
         sitemap_info.add_item({'location': '/offices', 'title':'Our Offices'})
         
@@ -22,12 +22,15 @@ class SitemapInfoTest(TestCase):
         self.assertTrue(sitemap_info.item_uuid(item))
     
     def test_name(self):
-        sitemap_info = MySitemapInfo('test')
+        sitemap_info = MySitemapInfo()
         self.assertEqual('test', unicode(sitemap_info))
         
 class MySitemapInfo(SitemapInfo):
-    def __init__(self, slug):
-        SitemapInfo.__init__(self, slug)
+    slug = "test"
+
+    
+    def __init__(self):
+        SitemapInfo.__init__(self, None)
         self._items = []
         
     def items(self):

@@ -3,7 +3,7 @@ from django.db import models, transaction
 from django.core.exceptions import  ObjectDoesNotExist
 from django.contrib.sites.models import Site
 
-from navigation import base
+from navigation.base import get_sitemap_info_list
 
 
 class SiteModelManager(models.Manager):
@@ -37,21 +37,21 @@ class SitemapManager(SiteModelManager):
     def refresh_current_site(self):
         from navigation.models import Sitemap
         
-        sources = base.site.list_sitemaps()
         site = Site.objects.get_current()
-        
-        for source in sources:
+        for sitemap_info in get_sitemap_info_list():
             try:
-                sitemap = Sitemap.objects.filter(site=site, slug=source.slug).get()
+                sitemap = Sitemap.objects.filter(site=site, slug=sitemap_info.slug).get()
             except ObjectDoesNotExist:
                 sitemap = Sitemap()
                 sitemap.site = site
                 
-            sitemap.slug = source.slug
+            sitemap.slug = sitemap_info.slug
             sitemap.save()
             sitemap.refresh()
         pass
         
 class MenuManager(SiteModelManager):
     pass
+
+
 

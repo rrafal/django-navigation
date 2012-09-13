@@ -1,14 +1,47 @@
 
-from django.utils.translation import pgettext
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
+from django.utils.importlib import import_module
+from django.utils.translation import pgettext
+
 
 import hashlib 
 
+
+def get_sitemap_info_list():
+    ''' Returns a list of SitemapInfo objects.
+    
+    NAVIGATION_SITEMAPS should be included in settings.py
+    This should be a list of classes that implements SitemapInfo. 
+    Those objects are loaded and returned.
+    '''
+    try:
+        settings_list = settings.NAVIGATION_SITEMAPS
+    except AttributeError:
+        raise ImproperlyConfigured('Add NAVIGATION_SITEMAPS to your settings.py file.')
+    
+    
+    info_list = []
+    for full_name in settings_list:
+        module_name, class_name = full_name.rsplit('.', 1)
+        
+        try:
+            module = import_module(module_name)
+            cls = getattr(module, class_name)
+        except (ImportError, AttributeError):
+            raise ImproperlyConfigured('Failed to load sitemap info: %s' % full_name)
+                
+        info_list.append( cls( settings.SITE_ID ) )
+    return info_list
+    
 
 class SitemapInfo(object):
     ''' Represents a collection of pages that can be displayed in navigation.
     
     When pages are temporarly disabled, the sitemap should still return them.
+    
+    Subclass must define "site" attribute.
     
     Subclasses may define:
     - item_location - URL for the page; should be uniqueue
@@ -19,8 +52,8 @@ class SitemapInfo(object):
     - item_order - number use for sorting of pages 
      '''
     
-    def __init__(self, slug):
-        self.slug = slug
+    def __init__(self, site_id):
+        self.site_id = site_id
         
     def items(self):
         ''' Items of the sitemap '''
@@ -69,12 +102,9 @@ class SitemapInfo(object):
     
     
 class FlatPageSitemapInfo(SitemapInfo):
-    ''' SitemapInfo for all pages in "django.contrib.flatpages". '''
+    ''' Sitemap for all pages in "django.contrib.flatpages". '''
     
-    def __init__(self, slug, site_id=None):
-        super(FlatPageSitemapInfo, self).__init__(slug)
-        self.site_id = site_id
-
+    slug = 'flatpages'
     
     def items(self):
         from django.contrib.flatpages.models import FlatPage
@@ -89,6 +119,9 @@ class FlatPageSitemapInfo(SitemapInfo):
 
     
 class CMSSitemapInfo(SitemapInfo):
+    
+    slug = 'cms-pages'
+    
     def items(self):
         from cms.utils.moderator import get_page_queryset
         page_queryset = get_page_queryset(None)
@@ -110,35 +143,4 @@ class CMSSitemapInfo(SitemapInfo):
         return item.published and item.in_navigation
     
     
-class SiteInfo(object):
-    def __init__(self):
-        self.sitemaps = {}
-        self.__initialized = False
-
-    def register_sitemap(self, sitemap):
-        self.sitemaps[ sitemap.slug ] = sitemap
-        
-    def list_sitemaps(self):
-        return self.sitemaps.values()
-        
-    def get_sitemap(self, name):
-        return self.sitemaps[ name ]
-    
-    def autodiscover(self):
-        from django.conf import settings
-        
-        if 'django.contrib.flatpages' in settings.INSTALLED_APPS:
-            sitemap = FlatPageSitemapInfo('flatpages', settings.SITE_ID)
-            self.register_sitemap(sitemap)
-    
-        if 'cms' in settings.INSTALLED_APPS:
-            sitemap = CMSSitemapInfo('cms-pages')
-            self.register_sitemap(sitemap)
-            
-        pass
-    
-
-site = SiteInfo()
-site.autodiscover()
-
 
