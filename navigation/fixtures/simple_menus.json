@@ -1,0 +1,50 @@
+[
+    {
+        "pk": 1,
+        "model": "navigation.menu",
+        "fields": {
+            "name": "Top",
+            "site": 1
+        }
+    },
+    
+    {
+        "pk": 2,
+        "model": "navigation.menu",
+        "fields": {
+            "name": "Bottom",
+            "site": 1
+        }
+    },
+    
+    {
+        "pk": 11,
+        "model": "navigation.menuitem",
+        "fields": {
+            "menu": 1,
+            "title" : "First",
+            "url": "/first"
+        }
+    },
+    
+    {
+        "pk": 12,
+        "model": "navigation.menuitem",
+        "fields": {
+            "menu": 1,
+            "title" : "Second",
+            "url": "/second"
+        }
+    },
+    
+    {
+        "pk": 13,
+        "model": "navigation.menuitem",
+        "fields": {
+            "menu": 1,
+            "url": "/second/a.html",
+            "my_parent": 12,
+            "title" : "Second A"
+        }
+    }
+]

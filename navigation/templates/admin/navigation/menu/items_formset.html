@@ -1,0 +1,64 @@
+{% load i18n admin_static %}
+
+<fieldset class="module collapse" >
+	<h2>{{ "Menu Items"|title }}</h2>
+	
+	<div class="description">{% trans "Menu Items are automatically saved." %}</div>
+
+	<div class="menuitem_set_editor" id="menuitem_set_editor">
+		
+		<div class="menuitem_set_editor_tree" >
+			<ul>
+			</ul>
+		</div>
+		
+		<div class="menuitem_set_editor_toolbar">
+			<span class="add-item"><a href="#">Add Item</a></span>
+			<span class="refresh-items"><a href="refresh/">Refresh</a></span>
+		</div>
+	</div>
+</fieldset>
+
+
+<script id="menuitem_set_item_template" type="text/x-jquery-tmpl">
+<li class="menuitem-${id}" data-id="${id}">
+	<div class="menuitem-content">
+		<input type="hidden" name="menuitem_set[${id}][parent]" value="${parent_id}" class="menuitem-parent-input" />
+		<div class="form-row">
+			<label>Title: </label>
+			<input type="text" name="menuitem_set[${id}][title]" value="${title}" class="menuitem-title-input" />
+		</div>
+		<div class="form-row">
+			<label>Location: </label>
+			<input type="text" name="menuitem_set[${id}][url]" value="${url}" class="menuitem-url-input" />
+		</div>
+		<div class="form-row">
+			<label>Status: </label>
+			<select name="menuitem_set[${id}][status]" class="menuitem-status-input" >
+				<option value="auto" >Auto</option>
+				<option value="enabled" >Enabled</option>
+				<option value="disabled" >Disabled</option>
+			</select>
+		</div>
+		<div class="form-row menuitem-sitemap-item-row">
+			<label>Page: </label>
+			<span class="menuitem_sitemap_item_name">${sitemap_item_title}</span> (<span class="menuitem_sitemap_item_status">${sitemap_item_status}</span>)
+		</div>
+
+		<div class="delete-item">
+			<span class="ui-icon ui-icon-closethick"></span>
+		</div>
+	</div>
+	<ul class="menuitem-children"></ul>
+</li>
+</script>
+
+<script type="text/javascript" >
+django.navigation.init_items_editor({
+	id: 'menuitem_set_editor',
+	template_id: 'menuitem_set_item_template' 
+});
+
+</script>
+
+

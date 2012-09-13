@@ -1,0 +1,13 @@
+{% load navigation_tags %}
+
+
+<ul class="{% if depth > 0 %}navigation-submenu{% else %}navigation-menu{% endif %}">
+{% for item in items %}
+	<li class="navigation-menu-item {% if item == current_item %}navigation-menu-current-item{% endif %} {% if item == current_parent_item %}navigation-menu-current-parent-item{% endif %} {% if item in current_ancestor_items %}navigation-menu-current-ancestor-item{% endif %}">
+		<a href="{{ item.url }}" >{{ item.title }}</a>
+		{% show_navigation_menu item %}
+	</li>
+{% endfor %}
+</ul>
+
+

@@ -1,0 +1,12 @@
+
+<div class="navigation-breadcrumbs">
+{% for item in items %}
+	{%if forloop.last %}
+	<span class="navigation-breadcrumbs-item navigation-breadcrumbs-current-item">{{ item.title }}</span>
+	{% else %}
+	<span class="navigation-breadcrumbs-item"><a href="{{ item.url }}" >{{ item.title }}</a></span>
+	<span class="navigation-breadcrumbs-arrow">&nbsp;&gt;&nbsp;</span>
+	{% endif %}
+{% endfor %}
+</div>
+

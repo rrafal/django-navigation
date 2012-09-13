@@ -1,0 +1,90 @@
+[
+    {
+        "pk": 1,
+        "model": "sites.site",
+        "fields": {
+            "domain" : "example.com",
+            "name": "Example"
+        }
+    },
+    
+    {
+        "pk": 1,
+        "model": "navigation.sitemap",
+        "fields": {
+            "site" : 1,
+            "slug": "flatpages"
+        }
+    },
+    
+    {
+        "pk": 1,
+        "model": "navigation.menu",
+        "fields": {
+            "site" : 1,
+            "sitemap": 1,
+            "name": "Flat Pages"
+        }
+    },
+    
+    
+    {
+        "pk": 20,
+        "model": "flatpages.flatpage",
+        "fields": {
+            "title": "aaa",
+            "url" : "/aaa/",
+            "sites" : [1]
+        }
+    },
+    
+    {
+        "pk": 21,
+        "model": "flatpages.flatpage",
+        "fields": {
+            "title": "bbb",
+            "url" : "/bbb/",
+            "sites" : [1]
+        }
+    },
+    
+    {
+        "pk": 22,
+        "model": "flatpages.flatpage",
+        "fields": {
+            "title": "ccc",
+            "url" : "/ccc/",
+            "sites" : [1]
+        }
+    },
+    
+    {
+        "pk": 23,
+        "model": "flatpages.flatpage",
+        "fields": {
+            "title": "aaa bbb",
+            "url" : "/aaa/bbb/",
+            "sites" : [1]
+        }
+    },
+    
+    {
+        "pk": 24,
+        "model": "flatpages.flatpage",
+        "fields": {
+            "title": "aaa ccc",
+            "url" : "/aaa/ccc/",
+            "sites" : [1]
+        }
+    },
+    
+    {
+        "pk": 25,
+        "model": "flatpages.flatpage",
+        "fields": {
+            "title": "aaa ccc ddd",
+            "url" : "/aaa/ccc/ddd/",
+            "sites" : [1]
+        }
+    }   
+]
