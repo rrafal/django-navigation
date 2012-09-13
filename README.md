@@ -17,7 +17,7 @@ Features
 Example
 --------
 
-Bello is a sample template that you can use to display flatpages. 
+Bellow is a sample template that you can use to display flatpages. 
 
     {% load navigation_tags %}
     <html>
@@ -45,7 +45,7 @@ When you change pages, menus need to be refreshed. Go to a menu that needs to be
 updated and click "Refresh". You can also select all menus and update them all at once.
 
 Once you create a menu, you need to add it to template. Use **show_navigation_menu** to do it.
-You need to give it menu name. You can also intruct it to display only a part of the menu. 
+You need to give it menu name. You can also tell it to display only a part of the menu. 
 
     {% show_navigation_menu "Main Menu" with root="/accounts/"  %}
 
