@@ -60,5 +60,27 @@ You can also specify your own template in the tag:
 
     {% show_navigation_menu "Main Menu" with template="nav/simple_menu.html"  %}
 
+You can add breadcrumbs using **show_navigation_breadcrumbs** template tab. You need to tell it what sitemap to use:
+
+    {% show_navigation_breadcrumbs with sitemap="flatpages"  %}
+    
+If you rather use menu to generate sitemaps, you can do that too:
+
+    {% show_navigation_breadcrumbs with menu="Main Menu"  %}
+
+Sitemap support *request_path* and *tempalate* arguments as well:
+
+    {% show_navigation_breadcrumbs with sitemap="flatpages", request_path=flatpage.url, template="nav/simple_crumbs.html"  %}
+
+
+Help
+-----
+
+If you don't know how to do something. Check the wiki first:
+https://github.com/rrafal/django-navigation/wiki
+
+django-navigation is a very new project. It surely has some bugs. If you find any, please report.
+There are some features that I'd like to add to the project. If you have any too, make a request.
+
 
 
