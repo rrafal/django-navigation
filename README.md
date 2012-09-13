@@ -44,7 +44,7 @@ You will find a new section in you Django Admin. It allows you to create menus.
 When you change pages, menus need to be refreshed. Go to a menu that needs to be 
 updated and click "Refresh". You can also select all menus and update them all at once.
 
-Once you create a menu, you need to add it to template. Use *show_navigation_menu* to do it.
+Once you create a menu, you need to add it to template. Use **show_navigation_menu** to do it.
 You need to give it menu name. You can also intruct it to display only a part of the menu. 
 
     {% show_navigation_menu "Main Menu" with root="/accounts/"  %}
@@ -55,7 +55,7 @@ you can pass current URL directly. For example:
 
     {% show_navigation_menu "Main Menu" with request_path=flatpage.url  %}
     
-To customize the HTML of the output, copy and edit this template file: *navigation/templates/navigation/menu.html*
+To customize the HTML of the output, copy and edit this template file: **navigation/templates/navigation/menu.html**
 You can also specify your own template in the tag:
 
     {% show_navigation_menu "Main Menu" with template="nav/simple_menu.html"  %}
