@@ -14,7 +14,7 @@ register = template.Library()
 
 
 @register.simple_tag(takes_context=True)
-def show_navigation_menu(context, menu, request_path=None, root=None, template='navigation/menu.html'):
+def show_navigation_menu(context, menu, root=None, template='navigation/menu.html', request_path=None):
 	""" Displays a navigation menu with given name 
 	
 	Passes the following information to template:
