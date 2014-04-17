@@ -1,10 +1,9 @@
-django-navigation
-=================
+# django-navigation
+
 
 Creates navigation menus and breadcrumbs.
 
-Features
---------
+### Features
 
  - flatpages, and django-cms support out of the box
  - auto-generated menus
@@ -14,8 +13,7 @@ Features
  - display part of a menu
 
 
-Example
---------
+### Example
 
 Bellow is a sample template that you can use to display flatpages. 
 
@@ -34,10 +32,13 @@ Bellow is a sample template that you can use to display flatpages.
     		<div>{{ flatpage.content }}</div>
     	</body>
     </html>
+    
 
-Installation
-------------
+### Authors
+ - [Rafal Radulski](http://www.radulski.net/)
 
+
+## Installation
 
 1. Edit settings.py
 2. Add 'navigation' to INSTALLED_APPS
@@ -63,8 +64,8 @@ Example:
         'navigation.base.FlatPageSitemapInfo',
     )
 
-How to Use
-----------
+### How to Use
+
 
 You will find a new section in you Django Admin. It allows you to create menus.
 
@@ -100,8 +101,8 @@ Sitemap support *request_path* and *tempalate* arguments as well:
     {% show_navigation_breadcrumbs with sitemap="flatpages", request_path=flatpage.url, template="nav/simple_crumbs.html"  %}
 
 
-Help
------
+### Help
+
 
 If you don't know how to do something. Check the wiki first:
 https://github.com/rrafal/django-navigation/wiki
