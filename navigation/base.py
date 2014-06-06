@@ -63,8 +63,8 @@ class SitemapInfo(object):
         ''' URL for the item '''
         try:
             return item.get_absolute_url()
-        except:
-            raise NotImplementedError()
+        except AttributeError:
+            raise NotImplementedError("Cannot get location.")
         
     def item_title(self, item):
         ''' Title for the item'''
@@ -123,9 +123,8 @@ class CMSSitemapInfo(SitemapInfo):
     slug = 'cms-pages'
     
     def items(self):
-        from cms.utils.moderator import get_page_queryset
-        page_queryset = get_page_queryset(None)
-        return page_queryset.all()
+        from cms.models import Page
+        return Page.objects.public()
     
     def item_parent(self, item):
         if item.parent:
@@ -140,7 +139,7 @@ class CMSSitemapInfo(SitemapInfo):
             return item.tree_id
         
     def item_enabled(self, item):
-        return item.published and item.in_navigation
+        return item.is_published(None) and item.in_navigation
     
     
 
