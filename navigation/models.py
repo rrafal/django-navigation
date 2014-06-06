@@ -1,6 +1,6 @@
 
 
-from django.db import models, transaction
+from django.db import models
 
 from django.utils.translation import ugettext as _
 from django.core.exceptions import  ObjectDoesNotExist
@@ -18,7 +18,6 @@ class Sitemap(models.Model):
     current_objects = SitemapManager('current')
     objects = SitemapManager()
     
-    #@transaction.commit_on_success
     def refresh(self):
         source_sitemap = self._get_source()
         source_has_tree = hasattr(source_sitemap, 'item_parent')
@@ -58,7 +57,6 @@ class Sitemap(models.Model):
             
             # delete self
             item.delete()
-        
         
         # update all items
         for s in source_sitemap.items():
@@ -271,7 +269,6 @@ class Menu(models.Model):
         except IndexError:
             raise ObjectDoesNotExist()
         
-    #@transaction.commit_on_success
     def refresh(self):
         # make sure we are starting with correct items
         self.all_items = None
