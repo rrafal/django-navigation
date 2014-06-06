@@ -1,6 +1,7 @@
 
 from django.contrib import admin
 from django.conf.urls import patterns
+from django.db import transaction
 from django.utils import simplejson
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.http import require_POST, require_safe
@@ -139,6 +140,7 @@ class MenuAdmin(admin.ModelAdmin):
         
         return HttpResponse(simplejson.dumps(data), mimetype="application/json")
 
+    @transaction.atomic
     def refresh_view(self, request, menu_id):
         
         Sitemap.objects.refresh_current_site()
