@@ -67,7 +67,6 @@ class Sitemap(models.Model):
             s_order = source_sitemap.item_attr(s, 'order', 0)
             s_parent = source_sitemap.item_attr(s, 'parent', None)
             
-            
             # update sitemap item
             try:
                 sitemap_item = self.item_set.filter(uuid=s_uuid).get()
@@ -94,16 +93,12 @@ class Sitemap(models.Model):
                     sitemap_item.parent = None
             
             sitemap_item.save()
-
         
         if not source_has_tree:
             self.calculate_parents_from_url()
         
         if not source_has_order:
             self.calculate_order_from_title()
-        
-        
-            
     
     def calculate_parents_from_url(self):
         for item in self.item_set.all():
@@ -116,12 +111,9 @@ class Sitemap(models.Model):
             item.order = index + 1     
             item.save()   
             
-    
     def find_parent_for_url(self, url):
         from urlparse import urlsplit, urldefrag, urljoin
         from os.path import dirname
-        
-        
         
         url_parts = urlsplit(url)
         parent_url = url
@@ -173,8 +165,6 @@ class Sitemap(models.Model):
         
                 
         return None
-        
-    
     
     def _get_source(self):
         for info in get_sitemap_info_list():
@@ -184,7 +174,9 @@ class Sitemap(models.Model):
     
     def __unicode__(self):
         return _(self.slug)
-        
+
+
+
 class SitemapItem(models.Model):
     sitemap = models.ForeignKey(Sitemap, related_name='item_set')
     parent = models.ForeignKey('self', verbose_name=_('Parent'), related_name='children', on_delete=models.SET_NULL, null=True, blank=True)
@@ -194,8 +186,6 @@ class SitemapItem(models.Model):
     url = models.CharField(max_length=255)
     order = models.IntegerField(default=1)
     status = models.CharField(max_length=16, default='enabled')
-
-        
     
     def save(self, *args, **kwargs):
         # update menu-item status values
@@ -211,7 +201,6 @@ class SitemapItem(models.Model):
     
     def __unicode__(self):
         return self.title
-
 
 
 
@@ -285,7 +274,6 @@ class Menu(models.Model):
             self.all_items = None
         
         self._load_items()
-
     
     def _refresh_items(self):
         for menu_item in self.all_items:
@@ -364,7 +352,6 @@ class Menu(models.Model):
             item.parent = None
             item.save()
 
-    
     def _load_items(self):
         if self.all_items == None:
             self.all_items = []
@@ -379,6 +366,7 @@ class Menu(models.Model):
         
     def __unicode__(self):
         return self.name
+
 
 
 class MenuItem(models.Model):
@@ -469,6 +457,3 @@ class MenuItem(models.Model):
         
     children = property(list_children)
     parent = property(get_parent, set_parent)
-
-    
-
