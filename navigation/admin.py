@@ -64,13 +64,62 @@ class MenuAdmin(admin.ModelAdmin):
         my_urls = patterns('',
             (r'^(\d)/view/', self.admin_site.admin_view(self.show_view)),
             (r'^(\d)/refresh/', self.admin_site.admin_view(self.refresh_view)),
-            (r'^(\d)/add_item/', self.admin_site.admin_view(self.add_item_view)),
-            (r'^(\d)/update_item/', self.admin_site.admin_view(self.update_item_view)),
-            (r'^(\d)/delete_item/', self.admin_site.admin_view(self.delete_item_view)),
 
         )
         return my_urls + urls
-    
+   
+    def save_model(self, request, obj, form, change):
+        super(MenuAdmin, self).save_model(request, obj, form, change)
+
+        old_items = obj.list_all_items()
+        
+        id_map = {}
+
+        # update each item
+        if request.POST.get('menuitem-max') is not None:
+            for i in range(0, int(request.POST.get('menuitem-max')) + 1):
+                my_id = request.POST.get('menuitem-%d-id' % (i,))
+                my_order = request.POST.get('menuitem-%d-order' % (i,))
+                my_url = request.POST.get('menuitem-%d-url' % (i,))
+                my_title = request.POST.get('menuitem-%d-title' % (i,))
+                my_status = request.POST.get('menuitem-%d-status' % (i,))
+
+                if my_id:
+                    try:
+                        item = obj.get_item(id=int(my_id))
+                    except Exception as e:
+                        item = MenuItem()
+                    item.menu = obj
+                    item.title = my_title
+                    item.url = my_url
+                    item.order = my_order
+                    item.parent = None
+                    item.save()
+
+                    id_map[my_id] = item
+
+                    if item in old_items:
+                        old_items.remove(item)
+
+            # assign parent
+            for i in range(0, int(request.POST.get('menuitem-max')) + 1):
+                my_id = request.POST.get('menuitem-%d-id' % (i,))
+                parent_id = request.POST.get('menuitem-%s-parent' % (i,))
+
+                if my_id:
+                    item = id_map.get(my_id)
+                    item.parent = id_map.get(parent_id)
+                    item.save()
+
+
+            # remove old items
+            for item in old_items:
+                item.delete()
+        
+        # done
+        obj.refresh()
+        
+
     def show_view(self, request, menu_id):
         menu = Menu.current_objects.get(pk=menu_id)
         data = { 
@@ -99,77 +148,6 @@ class MenuAdmin(admin.ModelAdmin):
         url = request.build_absolute_uri( reverse('admin:navigation_menu_change', args=[menu.id]) )
         return HttpResponseRedirect(url)
         
-
-    def add_item_view(self, request, menu_id):
-        # permissions check
-        if request.method != 'POST':
-            raise SuspiciousOperation()
-        
-        menu = Menu.current_objects.get(pk=menu_id)
-        if menu.sitemap != None :
-            raise ValidationError("Menu items are generated from sitemap.")
-        
-        # add item
-        item = MenuItem()
-        item.menu = menu
-        item.title = "New Item"
-        item.url = "/"
-        item.order = len(menu.list_all_items()) + 1
-        
-        item.save()
-        menu.refresh()
-        
-        # display results
-        data = { 'item': self._serialize_item(item) }
-        return HttpResponse(simplejson.dumps(data), mimetype="application/json")
-    
-    def update_item_view(self, request, menu_id):
-        if request.method != 'POST':
-            raise SuspiciousOperation()
-        
-        menuitem_id = int(request.POST['id'])
-        
-        menu = Menu.current_objects.get(pk=menu_id)
-        item = menu.get_item(pk=menuitem_id)
-        if 'title' in request.POST:
-            if item.title != request.POST['title']:
-                item.title = request.POST['title']
-                item.sync_title = False
-        if 'url' in request.POST:
-            item.url = request.POST['url']
-        if 'status' in request.POST:
-            item.status = request.POST['status']
-        if 'parent' in request.POST:
-            if request.POST['parent'] != '':
-                parent_id = int(request.POST['parent'])
-                item.parent = menu.get_item(pk=parent_id)
-            else:
-                item.parent = None
-        
-        item.save()
-        
-        menu.refresh()
-        
-        data = {}
-        return HttpResponse(simplejson.dumps(data), mimetype="application/json")
-    
-    def delete_item_view(self, request, menu_id):
-        # permission checks
-        if request.method != 'POST':
-            raise SuspiciousOperation()
-        
-        menuitem_id = int(request.POST['id'])
-        
-        menu = Menu.current_objects.get(pk=menu_id)
-        if menu.sitemap != None :
-            raise ValidationError("Menu items are generated from sitemap.")
-        
-        # remove item
-        menu.get_item(pk=menuitem_id).delete()
-        menu.refresh()
-        
-        data = {}
-        return HttpResponse(simplejson.dumps(data), mimetype="application/json")
     
     def _serialize_item(self, item):
         data = {

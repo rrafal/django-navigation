@@ -18,7 +18,7 @@ class Sitemap(models.Model):
     current_objects = SitemapManager('current')
     objects = SitemapManager()
     
-    @transaction.commit_on_success
+    #@transaction.commit_on_success
     def refresh(self):
         source_sitemap = self._get_source()
         source_has_tree = hasattr(source_sitemap, 'item_parent')
@@ -271,7 +271,7 @@ class Menu(models.Model):
         except IndexError:
             raise ObjectDoesNotExist()
         
-    @transaction.commit_on_success
+    #@transaction.commit_on_success
     def refresh(self):
         # make sure we are starting with correct items
         self.all_items = None
@@ -285,9 +285,7 @@ class Menu(models.Model):
         else:
             self._refresh_items()
             self.all_items = None
-            self.refresh_order()
             self.all_items = None
-            
         
         self._load_items()
 
@@ -381,8 +379,6 @@ class Menu(models.Model):
     def save(self, *args, **kwargs):
         # Call the "real" save() method.
         super(Menu, self).save(*args, **kwargs)
-        # update structure
-        self.refresh() 
         
     def __unicode__(self):
         return self.name
@@ -445,17 +441,17 @@ class MenuItem(models.Model):
         return self.menu.find_items(parent=self)
     
     def get_parent(self):
-        if self.my_parent_id == None:
+        if self.my_parent == None:
             return None
         else:
-            return self.menu.get_item(id=self.my_parent_id)
+            return self.menu.get_item(id=self.my_parent.id)
             
     def set_parent(self, new_parent):
         self.my_parent = new_parent
         
         # make sure parent wasn't change to something illegal
-        if not self.__is_parent_valid():
-            self.parent = None
+        #if not self.__is_parent_valid():
+        #    self.parent = None
     
     def __unicode__(self):
         return self.title
@@ -471,7 +467,7 @@ class MenuItem(models.Model):
             if current in visited:
                 return False
             visited.add(current)
-            current = current.parent
+            current = current.my_parent
         return True
         
     children = property(list_children)

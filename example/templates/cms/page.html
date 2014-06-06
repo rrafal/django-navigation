@@ -1,0 +1,22 @@
+{% load cms_tags sekizai_tags %}
+{% load navigation_tags %}
+<html>
+    <head>
+        {% render_block "css" %}
+    </head>
+    <body>
+        {% cms_toolbar %}
+        <nav >
+        {% show_navigation_menu "Main Menu" %}
+        </nav>
+
+
+        <div class="page-top">
+            {% placeholder top_content %}
+        </div>
+        <div class="page-content">
+            {% placeholder main_content %}
+        </div>
+        {% render_block "js" %}
+    </body>
+</html>

@@ -4,6 +4,8 @@ import os
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+gettext = lambda s: s
+
 PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
 
 ADMINS = (
@@ -47,7 +49,7 @@ USE_L10N = True
 USE_TZ = True
 
 LANGUAGES = [
-    ('en', 'English'),
+    ('en-us', 'English (US)'),
     ]
 
 
@@ -63,7 +65,7 @@ MEDIA_URL = '/media/'
 
 NAVIGATION_SITEMAPS = (
     'navigation.base.FlatPageSitemapInfo',
-#    'navigation.base.CMSSitemapInfo',
+    'navigation.base.CMSSitemapInfo',
 )
             
 
@@ -111,18 +113,23 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.media',
     'django.core.context_processors.static',
     'sekizai.context_processors.sekizai',
+    'cms.context_processors.cms_settings',
 )
 
 
 MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.doc.XViewMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'cms.middleware.user.CurrentUserMiddleware',
+    'cms.middleware.page.CurrentPageMiddleware',
+    'cms.middleware.toolbar.ToolbarMiddleware',
+    'cms.middleware.language.LanguageCookieMiddleware',
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
-    # Uncomment the next line for simple clickjacking protection:
-    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
 ROOT_URLCONF = 'example.urls'
@@ -139,6 +146,7 @@ TEMPLATE_DIRS = (
 
 
 
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -152,8 +160,20 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     'django.contrib.admindocs',
     'south',    
+    
+    'cms', 
+	'mptt', 
+	'menus', 
+	'south',
+	'sekizai',
+    
     'navigation',
 )
+
+CMS_TEMPLATES = (
+    ('cms/page.html', gettext('default')),
+)
+
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

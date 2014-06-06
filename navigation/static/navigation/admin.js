@@ -8,10 +8,9 @@ django.navigation.init_items_editor = function(options){
 	
 	$(document).ready(function(){
 		var $editor = $('#' + options.id);
-		var $tree = $editor.find('.menuitem_set_editor_tree > ul');
-		
-		var template = $( "#" + options.template_id ).template();
-    	
+		var $tree = $editor.find('.menuitem-tree > ul');
+    	var $template = $editor.find('#menuitem-empty').detach();
+    	var $max_prefix = $editor.find('[name="menuitem-max"]');
     	var csrf_name = 'csrfmiddlewaretoken';
     	var csrf_value = $editor.closest('form').find('input[name='+csrf_name+']').val();
     	
@@ -27,15 +26,11 @@ django.navigation.init_items_editor = function(options){
 	            listType: 'ul',
 	            items: 'li',
 	            toleranceElement: '> div',
-	            placeholder: 'ui-sortable-placeholder',
-	            stop: function(event, ui){
-	            	update_item_position(ui.item);
-	            }
+	            placeholder: 'ui-sortable-placeholder'
 	        });
 	  	}
         
-    	
-    	
+        
     	
     	// initialize display
     	$.ajax({
@@ -43,7 +38,6 @@ django.navigation.init_items_editor = function(options){
 			url: location.pathname + "view/",
 			success: function(data){
 				$(data['items']).each(function(index, info){
-					// show item
 					render_item(info);
 				})
 				
@@ -51,39 +45,30 @@ django.navigation.init_items_editor = function(options){
 			}
     	});
     	
-    	// auto save changes
-    	$editor.on('change', ':input', function(){
-    		var $item = $(this).closest('li');
-    		update_item_info($item);
-    	});
-    	
     	// handle adding items
     	$editor.find('.add-item a').click(function(event){
     		event.preventDefault()
-    		
-    		// create item on server
-    		var data = {};
-    		data[csrf_name] = csrf_value;
-    		
-    		$.ajax({
-    			type: 'POST',
-    			url: location.pathname + "add_item/",
-    			data: data,
-    			success: function(data){
-					var $item = render_item(data.item);
-	  				$item.hide().fadeIn()
-    			}
-    		});
-    		
+    	
+    		var info = {
+    			"status": "auto", 
+    			"parent_id": null, 
+    			"sitemap_item_title": null, 
+    			"title": "New Item", 
+    			"url": "/", 
+    			"sitemap_item_status": null, 
+    			"sitemap_item_id": null, 
+    			"id": null };
+    		$item = render_item( info );
+    		$item.hide().fadeIn()
     	});
     	
     	// handle deletion
     	$editor.on('click', '.delete-item', function(event){
     		event.preventDefault()
     		
-    		var $item = $(this).closest('li');
-    		
-    		delete_item($item);
+    		var $item = $(this).closest('li').fadeOut(function(){
+    			$(this).remove();
+    		});
     	});
     	
     	function render_item(info){
@@ -96,84 +81,48 @@ django.navigation.init_items_editor = function(options){
 			} else {
 				$list = $tree
 			}
-			var $item = $.tmpl( template, info ).appendTo( $list );
-			var $content = $item.children('.menuitem-content');
-			$content.find('.menuitem-status-input').val( info['status'] );
+			var html = $template.html();
+			var index = parseInt($max_prefix.val()) + 1;
+			$max_prefix.val(index);
+			info['prefix'] = index;
+			if( ! info['id'] ){
+				info['id'] = 'new-'+index;
+			}
+
+			jQuery.each(info, function(key, value){
+				html = html.replace( new RegExp('__'+key+'__', 'g'), value === null ? '' : value );
+			});
 			
-			console.log($content.find('.menuitem-sitemap-item-row'));
+			// update UI
+			var $item = $('<li class="menuitem-tree-item"></li>').html(html);
+			$item.addClass('menuitem-' + info['id']);
+			$item.find('.menuitem-status-input').val( info['status'] );
+			
 			if( info.sitemap_item_id ){
-				$content.find('.menuitem-url-input').prop('readonly', true);
-				$content.find('.menuitem-sitemap-item-row').show();
+				$item.find('.menuitem-url-input').prop('readonly', true);
 			} else {
-				$content.find('.menuitem-url-input').prop('readonly', false);
-				$content.find('.menuitem-sitemap-item-row').hide();
+				$item.find('.menuitem-sitemap-item-row').hide();
 			}
 			if( has_sitemap){
-  				$content.find('.delete-item').hide();
+  				$item.find('.delete-item').hide();
   			}
+
+  			// append
+  			$item.appendTo($list.get(0));
   			return $item;
     	}
     	
-    	// update item
-    	function update_item_position(item){
-    		var $item = $(item);
-        	var $parent = $item.parent().parent('li');
-        	var parent_id = $parent.attr('data-id');
-        	
-        	var $parent_input = $item.children('.menuitem-content').find('.menuitem-parent-input');
-        	if($parent_input.val() == parent_id){
-        		return;
-        	}
-        	
-    		$parent_input.val(parent_id);
-    		
-    		var data = {};
-    		data[csrf_name] = csrf_value;
-    		data['id'] = $item.attr('data-id');
-    		data['parent'] = parent_id ? parent_id : '';
-    		
-    		$.ajax({
-    			type: 'POST',
-    			url: location.pathname + "update_item/",
-    			data: data,
+    	// update ordering
+    	$editor.closest('form').submit(function(){
+    		$editor.find('.menuitem-parent-input').val('');
+    		$editor.find('.menuitem-tree-item').each(function(){
+    			var id = $(this).children('.menuitem-content').find('.menuitem-id-input').val();
+    			$(this).children('ul').find('.menuitem-parent-input').val(id);
     		});
-    	}
+    		$editor.find('.menuitem-order-input').each(function(index){
+    			$(this).val(index);
+    		});
+    	});
     	
-    	function update_item_info(item){
-    		var $item = $(item);
-  			var $content = $item.children('.menuitem-content');
-        	
-    		var data = {};
-    		data[csrf_name] = csrf_value;
-    		data['id'] = $item.attr('data-id');
-    		data['title'] = $content.find('.menuitem-title-input').val();
-    		data['url'] = $content.find('.menuitem-url-input').val();
-    		data['status'] = $content.find('.menuitem-status-input').val();
-    		
-    		$.ajax({
-    			type: 'POST',
-    			url: location.pathname + "update_item/",
-    			data: data,
-    		});
-    	}
-    	
-    	function delete_item(item){
-    		var $item = $(item);
-    		
-    		// delete item on server
-    		var data = {};
-    		data[csrf_name] = csrf_value;
-    		data['id'] = $item.attr('data-id');
-    		
-    		$.ajax({
-    			type: 'POST',
-    			url: location.pathname + "delete_item/",
-    			data: data,
-    		});
-    		
-    		// hide it
-    		$item.fadeOut();
-    	}
-		
 	});
 };

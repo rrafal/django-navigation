@@ -6,17 +6,17 @@
 .menuitem-module {
 	margin-top: 40px;
 }
-.menuitem_set_editor {
+.menuitem-editor {
 	margin: 0;
 }
-.menuitem_set_editor input[readonly] {
+.menuitem-editor input[readonly] {
 	background: #f5f5f5;
 }
 
-.menuitem_set_editor_toolbar {
+.menuitem-editor-toolbar {
 	padding: 10px 20px
 }
-.menuitem_set_editor_toolbar > span {
+.menuitem-editor-toolbar > span {
 	display: inline-block;
 	margin-right: 20px;
 }
@@ -25,56 +25,56 @@
 
 
 
-.menuitem_set_editor_tree {
+.menuitem-tree {
 	min-height: 200px;
 	margin: 8px 12px;
 }
-.menuitem_set_editor_tree .ui-sortable-placeholder {
+.menuitem-tree .ui-sortable-placeholder {
 	border: 2px dashed #4183C4;
 	border-radius: 3px;
 	background: #d0e1f2;
 	height: 40px;
 }
 
-.menuitem_set_editor_tree ul {
+.menuitem-tree ul {
 	margin: 0;
 	padding: 0;
 }
 
-.menuitem_set_editor_tree ul, 
-.menuitem_set_editor_tree li {
+.menuitem-tree ul, 
+.menuitem-tree li {
 	list-style-type: none;
 }
 
-.menuitem_set_editor_tree .form-row {
+.menuitem-tree .form-row {
 	display: inline;
 	border: 0;
 }
 
-.menuitem_set_editor_tree ul {
+.menuitem-tree ul {
 	margin: 0;
 	padding: 0;
 
 }
 
-.menuitem_set_editor_tree li {
+.menuitem-tree li {
 	margin: 0;
 	padding: 0;
 	position: relative;
 }
 
-.menuitem_set_editor_tree li ul{
+.menuitem-tree li ul{
 	margin-left: 40px;
 }
 
-.menuitem_set_editor_tree .delete-item {
+.menuitem-tree .delete-item {
 	float: right;
 	cursor: pointer;
 }
 
 
 
-.menuitem_set_editor_tree .menuitem-content  {
+.menuitem-tree .menuitem-content  {
 	border: 1px solid #d4d4d4;
 	border-radius: 3px;
 	border-color: #D4D4D4 #D4D4D4 #BCBCBC;
@@ -84,21 +84,21 @@
 	background: linear-gradient(top,  #ffffff 0%,#f6f6f6 47%,#ededed 100%);
 }
 
-.menuitem_set_editor_tree .ui-sortable .menuitem-content  {
+.menuitem-tree .ui-sortable .menuitem-content  {
 	cursor: move;
 }
 
 
 /** Add UI animation for user  **/
-.menuitem_set_editor_tree .menuitem-content:hover,
-.menuitem_set_editor_tree .menuitem-content:hover + ul .menuitem-content {
+.menuitem-tree .menuitem-content:hover,
+.menuitem-tree .menuitem-content:hover + ul .menuitem-content {
 	background: #eeeeee;
 }
 
 
-.menuitem_set_editor_tree .delete-item {
+.menuitem-tree .delete-item {
 	visibility: hidden;
 }
-.menuitem_set_editor_tree .menuitem-content:hover .delete-item {
+.menuitem-tree .menuitem-content:hover .delete-item {
 	visibility: visible;
 }
