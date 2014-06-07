@@ -1,0 +1,65 @@
+
+/** Layout **/
+#site-nav-footer {
+	clear: both;
+}
+
+/** Menu **/
+.navigation-menu {
+	margin: 0;
+	padding: 0;
+}
+.navigation-menu-item {
+	position: relative;
+	margin: 0;
+	padding: 0;
+}
+.navigation-menu-item > a {
+	color: #000;
+	display: block;
+	text-decoration: none;
+	padding: 5px 20px;
+}
+.navigation-menu-item:hover > a {
+	background: #eee;
+}
+
+.navigation-submenu {
+	display: none;
+	background: white;
+	border: 1px solid gray; 
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.navigation-menu-item:hover > .navigation-submenu {
+	 display: block;
+}
+
+/* Menu first level*/
+.navigation-menu > .navigation-menu-item {
+	float: left;
+	margin-right: 10px;
+}
+.navigation-menu > .navigation-menu-item > a {
+	display: block;
+	border: 1px solid gray;
+}
+.navigation-menu > .navigation-menu-item > a:hover {
+	background: #eee;
+}
+/* Menu second level */
+.navigation-menu > .navigation-menu-item > .navigation-submenu {
+	box-sizing: border-box;
+	position: absolute;
+	top: 100%;
+	left: 0;
+	min-width: 100%;
+}
+
+/** Menu 3+ sublevel **/
+.navigation-submenu > .navigation-menu-item > .navigation-submenu {
+	position: absolute;
+	top: 0;
+	left: 100%;
+}

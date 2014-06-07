@@ -1,22 +1,28 @@
-{% load cms_tags sekizai_tags %}
+{% load cms_tags sekizai_tags staticfiles %}
 {% load navigation_tags %}
 <html>
     <head>
         {% render_block "css" %}
+        <link type="text/css" rel="stylesheet" href="{% static 'example.css' %}"  />
     </head>
     <body>
         {% cms_toolbar %}
-        <nav >
-        {% show_navigation_menu "Main Menu" %}
+        <nav id="site-nav">
+            {% show_navigation_menu "Main Menu" %}
+            <div id="site-nav-footer"></div>
         </nav>
 
+        <h1>{% page_attribute "page_title" %}</h1>
+        
+        <div id="site-breadcrumbs">{% show_navigation_breadcrumbs menu="Main Menu" %}</div>
+        <div id="site-content">
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur porta tempor lacus, at varius felis dictum vitae. Nunc euismod metus eget vehicula vulputate. Curabitur luctus elit libero, vel accumsan justo pulvinar id. Donec auctor risus vitae nisi dapibus, ultricies mollis ligula lobortis. Nulla in libero lacus. Phasellus semper turpis justo, quis consequat ipsum vestibulum vitae. Etiam eu ante nec nibh rhoncus mollis. Vestibulum hendrerit tortor eu interdum dapibus. Nam eu egestas diam. Morbi placerat et urna ac suscipit.</p>
 
-        <div class="page-top">
-            {% placeholder top_content %}
-        </div>
-        <div class="page-content">
-            {% placeholder main_content %}
+            <p>Nullam ac mi ut arcu congue malesuada. Integer dapibus dolor eu varius porta. Praesent ultricies tincidunt lorem. Duis dapibus turpis id consequat pretium. Ut hendrerit, elit sit amet feugiat placerat, eros purus tempor justo, a feugiat urna odio eu nulla. Morbi pulvinar est dolor, sit amet porta lectus lacinia nec. Vestibulum in ornare eros. Proin hendrerit nunc vel quam venenatis pretium. Nam ut consequat eros. Donec a magna a nulla scelerisque vulputate. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+
+            <p>Donec suscipit nisl mattis diam tincidunt, sed placerat quam mattis. Fusce mauris purus, volutpat sit amet ipsum ac, facilisis faucibus lectus. Phasellus aliquet sapien est, non porttitor ante adipiscing feugiat. Ut vitae porta eros. Proin eu volutpat libero, ac elementum purus. Aenean faucibus hendrerit felis, a viverra urna sodales id. Maecenas tincidunt interdum mauris eget dignissim. Etiam varius sem at pretium vestibulum. Nullam suscipit ac est et cursus. Ut semper est leo, eu lobortis leo rhoncus vel. Curabitur non mauris posuere, posuere magna vel, molestie mi. Curabitur quis risus in est sollicitudin luctus eget in velit. In laoreet lacus semper tempor accumsan.</p>
         </div>
         {% render_block "js" %}
     </body>
 </html>
+.
