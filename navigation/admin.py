@@ -2,7 +2,6 @@
 from django.contrib import admin
 from django.conf.urls import patterns
 from django.db import transaction
-from django.utils import simplejson
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.http import require_POST, require_safe
 from django.core.exceptions import SuspiciousOperation, ValidationError
@@ -138,7 +137,8 @@ class MenuAdmin(admin.ModelAdmin):
         for item in menu.list_all_items():
             data['items'].append( self._serialize_item(item))
         
-        return HttpResponse(simplejson.dumps(data), mimetype="application/json")
+        import json
+        return HttpResponse(json.dumps(data), mimetype="application/json")
 
     @transaction.atomic
     def refresh_view(self, request, menu_id):
