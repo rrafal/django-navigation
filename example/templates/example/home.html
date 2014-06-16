@@ -1,0 +1,28 @@
+{% load cms_tags sekizai_tags staticfiles %}
+{% load navigation_tags %}
+<html>
+    <head>
+        {% render_block "css" %}
+        <link type="text/css" rel="stylesheet" href="{% static 'example.css' %}"  />
+    </head>
+    <body>
+        {% cms_toolbar %}
+        <nav id="site-nav">
+            {% show_navigation_menu "Main Menu" %}
+            <div id="site-nav-footer"></div>
+        </nav>
+
+        <h1>Home</h1>
+        
+        <div id="site-breadcrumbs">{% show_navigation_breadcrumbs menu="Main Menu" %}</div>
+        <nav id="site-sidebar">
+            {% show_navigation_menu "Main Menu" template="navigation/dynamic-small.html" %}
+        </nav>
+        <div id="site-content">
+            <p>This is a demo of Django Navigation app.</p>
+
+        </div>
+        <div id="site-footer">Don't see any pages? Go to <a href="{% url 'setup' %}">setup</a>.</div>
+        {% render_block "js" %}
+    </body>
+</html>

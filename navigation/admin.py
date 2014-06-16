@@ -11,6 +11,7 @@ from navigation.models import Sitemap, Menu, MenuItem
 
 from django.conf import settings
 
+@transaction.atomic
 def refresh_items(modeladmin, request, queryset):
     Sitemap.objects.refresh_current_site()
     for menu in queryset.all():
