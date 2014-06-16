@@ -57,11 +57,17 @@
 	min-width: 100%;
 }
 
-/** Menu 3+ sublevel **/
+/* Menu 3+ sublevel */
 .navigation-menu .navigation-submenu > .navigation-menu-item > .navigation-submenu {
 	position: absolute;
 	top: 0;
 	left: 100%;
+}
+
+/** Breadcrumbs **/
+.navigation-breadcrumbs a {
+	color: blue;
+	text-decoration: none;
 }
 
 /** Sidebar **/
@@ -69,4 +75,11 @@
 	float: right;
 	width: 200px;
 	margin-bottom: 40px;
+}
+#site-sidebar .navigation-menu-item > a {
+	color: blue;
+	text-decoration: none;
+}
+#site-sidebar .navigation-current-item > a {
+	font-weight: bold;
 }
