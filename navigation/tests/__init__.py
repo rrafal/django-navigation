@@ -1,8 +1,8 @@
 
-from navigation.tests.base import SitemapInfoTest
-from navigation.tests.models import ModelTest, SitemapTest
-from navigation.tests.admin import MenuAdminTest
-from navigation.tests.templatetags import MenuTagTest, BreadcrumbsTagTest
+from navigation.tests.base import *
+from navigation.tests.models import *
+from navigation.tests.admin import *
+from navigation.tests.templatetags import *
 
 
 
