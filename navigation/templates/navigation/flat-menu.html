@@ -1,7 +1,7 @@
 
 <ul class="navigation-menu">
 {% for item in items %}
-	<li class="navigation-menu-item {% if item.is_current %}navigation-menu-current-item{% endif %} {% if item.is_current_parent %}navigation-menu-current-parent-item{% endif %} {% if item.is_current_ancestor %}navigation-menu-current-ancestor-item{% endif %}">
+	<li {% include 'navigation/_item-attr.html' %}>
 		<a href="{{ item.url }}" >{{ item.title }}</a>
 	</li>
 {% endfor %}

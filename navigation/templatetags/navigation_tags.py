@@ -4,7 +4,7 @@
 from django import template
 from django.core.exceptions import ObjectDoesNotExist
 from django.template.loader import get_template
-from django.template.context import Context as TemplateContext
+from django.template.context import Context as DjangoTemplateContext
 from django.utils.translation import pgettext
 
 from navigation.models import Sitemap, Menu, MenuItem
@@ -24,7 +24,7 @@ def show_navigation_menu(context, menu, root=None, template='navigation/menu.htm
 	items -- items being rendered
 	current_item -- item that visitor is currently viewing
 	current_parent_item -- parent of current_item
-	current_ancestors_items -- all ancestors of current_item
+	current_ancestor_items -- all ancestors of current_item
 	
 	
 	Arguments:
@@ -73,14 +73,7 @@ def show_navigation_menu(context, menu, root=None, template='navigation/menu.htm
 				data[k] = v
 	
 	# render
-	new_context = Context(data, *{
-	    'autoescape': context.autoescape,
-	    'current_app': context.current_app,
-	    'use_l10n': context.use_l10n,
-	    'use_tz': context.use_tz,
-		})
-	
-	return get_template(template).render(new_context)
+	return render_template(context, template, data)
 
 def get_navigation_menu(menu, root=None):
 	this = None # currently display element; Menu or MenuItem
@@ -143,7 +136,7 @@ def get_current_items(menu, current_url):
 	current_items = the_menu.find_items(url=current_url)
 	if len(current_items):
 		result['current_item'] = current_items[0]
-		result['current_parent_item'] = result['current_item'].parent
+		result['current_parent_item'] = current_items[0].parent
 	
 		ancestor = result['current_parent_item']
 		while ancestor:
@@ -188,14 +181,7 @@ def show_navigation_breadcrumbs(context, menu=None, sitemap=None, request_path=N
 		return show_missing_menu(context, name, 'navigation/breadcrumbs-missing.html')
 	
 	data = {'items': items }
-	new_context = Context(data, *{
-		'autoescape': context.autoescape,
-		'current_app': context.current_app,
-		'use_l10n': context.use_l10n,
-		'use_tz': context.use_tz,
-		})
-	return get_template(template).render(new_context)
-
+	return render_template(context, template, data)
 		
 
 def get_navigation_breadcrumbs(current_path, menu=None, sitemap=None):
@@ -285,22 +271,23 @@ def get_breadcrumbs_from_sitemap(current_path, sitemap):
 def show_missing_menu(context, menu, template):
 	if menu:
 		data = {'name': menu }
-		new_context = Context(data, *{
-			'autoescape': context.autoescape,
-			'current_app': context.current_app,
-			'use_l10n': context.use_l10n,
-			'use_tz': context.use_tz,
-			})
-		return get_template(template).render(new_context)
+		return render_template(context, template, data)
 	else:
 		return ''
 
-class Context(TemplateContext):
+class Context(DjangoTemplateContext):
 	''' Context used for rendering menus.
 	
 	Allows to efficiently render submenus.
 	'''
 	pass
         
-
-
+def render_template(context, template, data):
+	new_context = Context(data, *{
+	    'autoescape': context.autoescape,
+	    'current_app': context.current_app,
+	    'use_l10n': context.use_l10n,
+	    'use_tz': context.use_tz,
+		})
+	
+	return get_template(template).render(new_context)

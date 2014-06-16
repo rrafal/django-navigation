@@ -1,0 +1,17 @@
+{% load navigation_tags %}
+
+<ul class="navigation-submenu">
+{% for item in items %}
+	{% if item == current_item or item == current_parent_item and current_item.active_children|length == 0 %}
+	<li {% include 'navigation/_item-attr.html' %}>
+		<a href="{{ item.url }}" >{{ item.title }}</a>
+		{% show_navigation_menu item template='navigation/dynamic-small-submenu.html' %}
+	</li>
+	{% elif item == current_parent_item or item in current_ancestor_items %}
+	<li {% include 'navigation/_item-attr.html' %}>
+		<a href="{{ item.url }}" >{{ item.title }}</a>
+		{% show_navigation_menu item template='navigation/dynamic-small-path.html' %}
+	</li>
+	{% endif %}
+{% endfor %}
+</ul>

@@ -15,6 +15,9 @@
         <h1>{% page_attribute "page_title" %}</h1>
         
         <div id="site-breadcrumbs">{% show_navigation_breadcrumbs menu="Main Menu" %}</div>
+        <nav id="site-sidebar">
+            {% show_navigation_menu "Main Menu" template="navigation/dynamic-small.html" %}
+        </nav>
         <div id="site-content">
             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur porta tempor lacus, at varius felis dictum vitae. Nunc euismod metus eget vehicula vulputate. Curabitur luctus elit libero, vel accumsan justo pulvinar id. Donec auctor risus vitae nisi dapibus, ultricies mollis ligula lobortis. Nulla in libero lacus. Phasellus semper turpis justo, quis consequat ipsum vestibulum vitae. Etiam eu ante nec nibh rhoncus mollis. Vestibulum hendrerit tortor eu interdum dapibus. Nam eu egestas diam. Morbi placerat et urna ac suscipit.</p>
 
@@ -25,4 +28,3 @@
         {% render_block "js" %}
     </body>
 </html>
-.

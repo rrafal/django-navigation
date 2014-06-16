@@ -425,6 +425,9 @@ class MenuItem(models.Model):
     def list_children(self):
         return self.menu.find_items(parent=self)
     
+    def list_active_children(self):
+        return [c for c in self.list_children() if c.is_enabled()]
+    
     def get_parent(self):
         if self.my_parent == None:
             return None
@@ -456,4 +459,5 @@ class MenuItem(models.Model):
         return True
         
     children = property(list_children)
+    active_children = property(list_active_children)
     parent = property(get_parent, set_parent)

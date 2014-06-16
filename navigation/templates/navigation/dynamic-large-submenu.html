@@ -1,0 +1,13 @@
+{% load navigation_tags %}
+
+<ul class="navigation-submenu">
+{% for item in items %}
+	<li {% include 'navigation/_item-attr.html' %}>
+		<a href="{{ item.url }}" >{{ item.title }}</a>
+		{% if item == current_item or item == current_parent_item %}
+			{% show_navigation_menu item template='navigation/dynamic-large-submenu.html' %}
+		{% endif %}
+	</li>
+{% endfor %}
+</ul>
+
