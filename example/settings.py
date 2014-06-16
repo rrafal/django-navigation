@@ -145,7 +145,8 @@ TEMPLATE_DIRS = (
     os.path.join(PROJECT_DIR, "templates"),
 )
 
-
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+SOUTH_TESTS_MIGRATE = False
 
 
 INSTALLED_APPS = (
@@ -160,12 +161,12 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     'django.contrib.admindocs',
+    'django_nose',
     'south',    
     
     'cms', 
 	'mptt', 
 	'menus', 
-	'south',
 	'sekizai',
     
     'navigation',
