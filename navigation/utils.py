@@ -4,10 +4,18 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.utils.importlib import import_module
 from django.utils.translation import pgettext
+ 
 
+def initialize_autorefresh():	
+    def refresh(info):
+        from navigation.models import Sitemap
+        for sitemap in Sitemap.objects.filter(slug=info.slug):
+            sitemap.refresh()
+            for menu in sitemap.menus.all():
+                menu.refresh()
 
-import hashlib 
-
+    for info in get_sitemap_info_list():
+        info.add_listener(refresh)
 
 def get_sitemap_info_list():
     ''' Returns a list of SitemapInfo objects.
@@ -36,7 +44,7 @@ def get_sitemap_info_list():
     return info_list
     
 
-class SitemapInfo(object):
+class AbstractSitemapInfo(object):
     ''' Represents a collection of pages that can be displayed in navigation.
     
     When pages are temporarly disabled, the sitemap should still return them.
@@ -78,11 +86,14 @@ class SitemapInfo(object):
         - hashlib.sha224
         
         If it is a string, it must be not longer than 255 characters.'''
+        
+        import hashlib
+        
         if isinstance(item, models.Model):
             name = '/model/%s/%s' % (item.__class__.__name__, item.pk)
         else:
             name = '/url/%s' % self.item_location(item)
-            
+        
         return hashlib.sha512(name).hexdigest()
      
     def item_enabled(self, item):
@@ -97,11 +108,15 @@ class SitemapInfo(object):
             return attr(item)
         return attr
     
+    def add_listener(self, callback):
+        ''' Funcation callack should be called when sitemap changes. '''
+        pass
+    
     def __unicode__(self):
         return pgettext('navigation', self.slug)
     
     
-class FlatPageSitemapInfo(SitemapInfo):
+class FlatPageSitemapInfo(AbstractSitemapInfo):
     ''' Sitemap for all pages in "django.contrib.flatpages". '''
     
     slug = 'flatpages'
@@ -118,7 +133,7 @@ class FlatPageSitemapInfo(SitemapInfo):
         return item.title
 
     
-class CMSSitemapInfo(SitemapInfo):
+class CMSSitemapInfo(AbstractSitemapInfo):
     
     slug = 'cms-pages'
     
@@ -141,5 +156,11 @@ class CMSSitemapInfo(SitemapInfo):
     def item_enabled(self, item):
         return item.is_published(None) and item.in_navigation
     
+    def add_listener(self, callback):
+        ''' Funcation callack should be called when sitemap changes. '''
+        import cms.signals as cms_signals
+        def receiver(sender, **kwargs):
+            callback(self)
+        cms_signals.post_publish.connect(receiver, weak=False)
     
 

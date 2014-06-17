@@ -221,3 +221,8 @@ class MenuAdmin(admin.ModelAdmin):
    
 admin.site.register(Menu, MenuAdmin)
 
+
+if getattr(settings, 'NAVIGATION_AUTO_REFRESH', False):
+    from .utils import initialize_autorefresh
+    initialize_autorefresh()
+

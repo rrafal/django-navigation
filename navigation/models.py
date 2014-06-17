@@ -210,7 +210,7 @@ class Menu(models.Model):
     sitemap = models.ForeignKey(Sitemap,
         verbose_name=_('Sitemap'),
         help_text="Select source sitemap to automatically configure menu items",
-        related_name='menu_set', null=True, blank=True)
+        related_name='menus', null=True, blank=True)
     name = models.CharField(_('Name'), max_length=255)
     all_items = None
     

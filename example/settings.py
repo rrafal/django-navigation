@@ -67,6 +67,7 @@ NAVIGATION_SITEMAPS = (
     'navigation.utils.FlatPageSitemapInfo',
     'navigation.utils.CMSSitemapInfo',
 )
+NAVIGATION_AUTO_REFRESH = True
             
 
 ADMIN_MEDIA_PREFIX = '/static/admin/'

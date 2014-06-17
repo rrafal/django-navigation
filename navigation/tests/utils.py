@@ -1,7 +1,7 @@
 
 
 from django.test import TestCase
-from navigation.utils import SitemapInfo
+from navigation.utils import AbstractSitemapInfo
 
 class SitemapInfoTest(TestCase):
     
@@ -25,12 +25,12 @@ class SitemapInfoTest(TestCase):
         sitemap_info = MySitemapInfo()
         self.assertEqual('test', unicode(sitemap_info))
         
-class MySitemapInfo(SitemapInfo):
+class MySitemapInfo(AbstractSitemapInfo):
     slug = "test"
 
     
     def __init__(self):
-        SitemapInfo.__init__(self, None)
+        AbstractSitemapInfo.__init__(self, None)
         self._items = []
         
     def items(self):
