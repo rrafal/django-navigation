@@ -1,7 +1,7 @@
 
 
 from django.test import TestCase
-from navigation.base import SitemapInfo
+from navigation.utils import SitemapInfo
 
 class SitemapInfoTest(TestCase):
     

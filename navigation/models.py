@@ -1,11 +1,8 @@
 
-
-from django.db import models
-
-from django.utils.translation import ugettext as _
 from django.core.exceptions import  ObjectDoesNotExist
+from django.db import models
+from django.utils.translation import ugettext as _
 
-from navigation import base
 from navigation.managers import *
 
 
@@ -167,6 +164,8 @@ class Sitemap(models.Model):
         return None
     
     def _get_source(self):
+        from .utils import get_sitemap_info_list
+        
         for info in get_sitemap_info_list():
             if info.slug == self.slug:
                 return info

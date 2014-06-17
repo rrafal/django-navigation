@@ -3,7 +3,7 @@ from django.db import models, transaction
 from django.core.exceptions import  ObjectDoesNotExist
 from django.contrib.sites.models import Site
 
-from navigation.base import get_sitemap_info_list
+from navigation.utils import get_sitemap_info_list
 
 
 class SiteModelManager(models.Manager):

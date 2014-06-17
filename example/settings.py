@@ -64,8 +64,8 @@ MEDIA_URL = '/media/'
 
 
 NAVIGATION_SITEMAPS = (
-    'navigation.base.FlatPageSitemapInfo',
-    'navigation.base.CMSSitemapInfo',
+    'navigation.utils.FlatPageSitemapInfo',
+    'navigation.utils.CMSSitemapInfo',
 )
             
 
