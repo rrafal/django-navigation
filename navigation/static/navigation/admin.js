@@ -40,27 +40,73 @@ django.navigation.init_items_editor = function(options){
 				$(data['items']).each(function(index, info){
 					render_item(info);
 				})
-				
-				
 			}
     	});
+		
+		
+		$editor.find('.add-item').each(function(){
+			// autocomplete item title
+			var $input = $(this).find('input');
+			var $button = $(this).find('button');
+			var autocomplete_url = $input.data('autocompleteUrl');
+
+			$input.autocomplete({
+				'source' : function(request, response){
+					var query = {
+						'term' : $input.val()
+						};
+					$.get( autocomplete_url, query, function(response_data){
+						var data = [];
+
+						$.each(response_data, function(index, item){
+							var label = item.title + " ("+item.url+")";
+							data.push({'label': label, 'value': item.url});
+						});
+						response(data);
+					}, 'json'); 
+				}
+			});
+			$input.bind("keypress", function(e) {
+				if (e.keyCode == 13) {               
+					e.preventDefault();
+					$button.click();
+				}
+			});
+		
     	
-    	// handle adding items
-    	$editor.find('.add-item a').click(function(event){
-    		event.preventDefault()
-    	
-    		var info = {
-    			"status": "auto", 
-    			"parent_id": null, 
-    			"sitemap_item_title": null, 
-    			"title": "New Item", 
-    			"url": "/", 
-    			"sitemap_item_status": null, 
-    			"sitemap_item_id": null, 
-    			"id": null };
-    		$item = render_item( info );
-    		$item.hide().fadeIn()
-    	});
+			// handle adding items
+			$button.click(function(event){
+				event.preventDefault()
+				
+				var url = $input.val();
+				var info = {
+					"status": "auto", 
+					"parent_id": null, 
+					"sitemap_item_title": null, 
+					"title": "New Item", 
+					"url": "/", 
+					"sitemap_item_status": null, 
+					"sitemap_item_id": null, 
+					"id": null 
+					};
+					
+				if(url == ''){
+					add_item(info);
+				} else {
+					$.get( autocomplete_url, {'url': url}, function(data){
+						if(data){
+							info['sitemap_item_title'] = data[0]['title'];
+							info['title'] = data[0]['title'];
+							info['url'] = data[0]['url'];
+							info['sitemap_item_status'] = data[0]['status'];
+							info['sitemap_item_id'] = data[0]['id'];
+						}
+						add_item(info);
+					}, 'json'); 
+					$input.val('');
+				}
+			});
+		});// end of add-item
     	
     	// handle deletion
     	$editor.on('click', '.delete-item', function(event){
@@ -71,6 +117,10 @@ django.navigation.init_items_editor = function(options){
     		});
     	});
     	
+		function add_item(info){
+			var $item = render_item( info );
+			$item.hide().fadeIn()
+		}
     	function render_item(info){
     		var $list = null;
     		var $parent = null;
@@ -114,10 +164,10 @@ django.navigation.init_items_editor = function(options){
     	
     	// update ordering
     	$editor.closest('form').submit(function(){
-    		$editor.find('.menuitem-parent-input').val('');
+    		$editor.find('.menuitem-parent-id-input').val('');
     		$editor.find('.menuitem-tree-item').each(function(){
     			var id = $(this).children('.menuitem-content').find('.menuitem-id-input').val();
-    			$(this).children('ul').find('.menuitem-parent-input').val(id);
+    			$(this).children('ul').find('.menuitem-parent-id-input').val(id);
     		});
     		$editor.find('.menuitem-order-input').each(function(index){
     			$(this).val(index);

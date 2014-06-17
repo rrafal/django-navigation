@@ -135,8 +135,6 @@ class Sitemap(models.Model):
                 except ObjectDoesNotExist:
                     pass
         
- 
-        
         # make the path shorter
         path = url_parts.path
         while path != '' and path != '/':
@@ -160,7 +158,6 @@ class Sitemap(models.Model):
                 except ObjectDoesNotExist:
                     pass
         
-                
         return None
     
     def _get_source(self):
@@ -407,6 +404,14 @@ class MenuItem(models.Model):
             self.sync_title = True
         
         self.save()
+        
+    def save(self, *args, **kwargs):
+        if self.sitemap_item:
+            self.sitemap_item_status = self.sitemap_item.status
+        else:
+            self.sitemap_item_status = None
+                
+        super(MenuItem, self).save(*args, **kwargs)
         
     def is_enabled(self):
         if self.status == 'enabled':

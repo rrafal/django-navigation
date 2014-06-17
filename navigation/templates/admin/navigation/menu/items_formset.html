@@ -12,7 +12,9 @@
 				<div class="menuitem-content">
 					<input type="hidden" name="menuitem-__prefix__-id" value="__id__" class="menuitem-id-input" />
 					<input type="hidden" name="menuitem-__prefix__-order" value="" class="menuitem-order-input" />
-					<input type="hidden" name="menuitem-__prefix__-parent" value="__parent_id__" class="menuitem-parent-input" />
+					<input type="hidden" name="menuitem-__prefix__-parent-id" value="__parent_id__" class="menuitem-parent-id-input" />
+					<input type="hidden" name="menuitem-__prefix__-sitemap-item-id" value="__sitemap_item_id__" class="menuitem-sitemap-item-id-input" />
+
 					<div class="form-row">
 						<label>Title: </label>
 						<input type="text" name="menuitem-__prefix__-title" value="__title__" class="menuitem-title-input" />
@@ -44,8 +46,8 @@
 		</div>
 		
 		<div class="menuitem-editor-toolbar">
-			<span class="add-item"><a href="#">Add Item</a></span>
-			<span class="refresh-items"><a href="refresh/">Refresh</a></span>
+			<span class="add-item"><input type="text" placeholder="title or URL" data-autocomplete-url="{% url 'admin:navigation_menu_changelist' %}find-sitemap-items/" /><button class="button" type="button">Add Item</button></span>
+			<span class="refresh-items"><a href="refresh/">Refresh items</a></span>
 		</div>
 	</div>
 </fieldset>

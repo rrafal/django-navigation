@@ -7,7 +7,7 @@ from django.views.decorators.http import require_POST, require_safe
 from django.core.exceptions import SuspiciousOperation, ValidationError
 from django.core.urlresolvers import reverse
 
-from navigation.models import Sitemap, Menu, MenuItem
+from navigation.models import Sitemap, SitemapItem, Menu, MenuItem
 
 from django.conf import settings
 
@@ -65,7 +65,7 @@ class MenuAdmin(admin.ModelAdmin):
         my_urls = patterns('',
             (r'^(\d)/view/', self.admin_site.admin_view(self.show_view)),
             (r'^(\d)/refresh/', self.admin_site.admin_view(self.refresh_view)),
-
+            (r'^find-sitemap-items/', self.admin_site.admin_view(self.find_sitemap_items)),
         )
         return my_urls + urls
    
@@ -84,6 +84,7 @@ class MenuAdmin(admin.ModelAdmin):
                 my_url = request.POST.get('menuitem-%d-url' % (i,))
                 my_title = request.POST.get('menuitem-%d-title' % (i,))
                 my_status = request.POST.get('menuitem-%d-status' % (i,))
+                my_sitemap_item_id = request.POST.get('menuitem-%d-sitemap-item-id' % (i,))
 
                 if my_id:
                     try:
@@ -95,6 +96,8 @@ class MenuAdmin(admin.ModelAdmin):
                     item.url = my_url
                     item.order = my_order
                     item.parent = None
+                    if my_sitemap_item_id:
+                        item.sitemap_item = SitemapItem.objects.get(id=my_sitemap_item_id)
                     item.save()
 
                     id_map[my_id] = item
@@ -105,7 +108,7 @@ class MenuAdmin(admin.ModelAdmin):
             # assign parent
             for i in range(0, int(request.POST.get('menuitem-max')) + 1):
                 my_id = request.POST.get('menuitem-%d-id' % (i,))
-                parent_id = request.POST.get('menuitem-%s-parent' % (i,))
+                parent_id = request.POST.get('menuitem-%s-parent-id' % (i,))
 
                 if my_id:
                     item = id_map.get(my_id)
@@ -136,23 +139,58 @@ class MenuAdmin(admin.ModelAdmin):
         
         
         for item in menu.list_all_items():
-            data['items'].append( self._serialize_item(item))
+            data['items'].append( self._serialize_menu_item(item))
         
         import json
-        return HttpResponse(json.dumps(data), mimetype="application/json")
+        return HttpResponse(json.dumps(data), content_type="application/json")
 
     @transaction.atomic
     def refresh_view(self, request, menu_id):
-        
         Sitemap.objects.refresh_current_site()
         menu = Menu.objects.get(pk=menu_id)
         menu.refresh()
         
         url = request.build_absolute_uri( reverse('admin:navigation_menu_change', args=[menu.id]) )
-        return HttpResponseRedirect(url)
-        
+        return HttpResponseRedirect(url)    
     
-    def _serialize_item(self, item):
+    def find_sitemap_items(self, request):
+        import json
+        from .models import SitemapItem
+        
+        items = []
+        
+        if request.GET.get('url') != None:
+            url = request.GET.get('url')
+            items = SitemapItem.objects.filter(url__iexact=url)
+        
+        if request.GET.get('term') != None:
+            term = request.GET.get('term')
+            for item in SitemapItem.objects.filter(title__istartswith=term):
+                items.append(item)
+            for item in SitemapItem.objects.filter(url__istartswith=term):
+                items.append(item)
+            url = "/"+term
+            for item in SitemapItem.objects.filter(url__istartswith=url):
+                items.append(item)
+            
+            if not items:
+                for item in SitemapItem.objects.filter(title__icontains=term):
+                    items.append(item)
+                for item in SitemapItem.objects.filter(url__icontains=term):
+                    items.append(item)
+        
+        data = []
+        for item in items:
+            data.append({
+                'id' : item.id,
+                'uuid' : item.uuid,
+                'title' : item.title,
+                'url' : item.url,
+                'status' : item.status,
+                })
+        return HttpResponse(json.dumps(data), content_type="application/json")
+    
+    def _serialize_menu_item(self, item):
         data = {
             'id': item.id,
             'title' : item.title,

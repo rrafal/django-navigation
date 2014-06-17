@@ -14,13 +14,16 @@
 }
 
 .menuitem-editor-toolbar {
-	padding: 10px 20px
+	margin: 8px 12px;
 }
 .menuitem-editor-toolbar > span {
 	display: inline-block;
 	margin-right: 20px;
 }
-
+.menuitem-editor-toolbar .add-item input {
+	padding: 3px 5px;
+	width: 200px;
+}
 
 
 
@@ -101,4 +104,10 @@
 }
 .menuitem-tree .menuitem-content:hover .delete-item {
 	visibility: visible;
+}
+
+
+/** Autocopplete **/
+.ui-autocomplete .ui-menu-item {
+	list-style: none;
 }
