@@ -55,14 +55,6 @@ class ModelTest(TestCase):
         menu = Menu.objects.get(name="Top")
         self.assertRaises(ObjectDoesNotExist, lambda: menu.get_item(id=13))
         
-    def test_flatten(self):
-        menu = Menu.objects.get(name="Top")
-        initial = len(menu.list_top_items())
-        
-        menu.flatten()
-        final = len(menu.list_top_items())
-        self.assertTrue(initial < final)
-        
     def test_is_enabled(self):
         menu = Menu.objects.get(name="Top")
         item = menu.get_item(id=12)
@@ -79,63 +71,6 @@ class ModelTest(TestCase):
 class SitemapTest(TestCase):
     fixtures = ['flatpages']
     
-    def test_refresh_database(self):
-        Sitemap.objects.all().delete()
-        Sitemap.objects.refresh_current_site()
-        self.assertNotEqual(0, len(SitemapItem.objects.all()))
-        
-        
-    def test_menu_from_flatpages(self):
-        Sitemap.objects.refresh_current_site()        
-        
-        menu = Menu.objects.get(pk=1)
-        menu.refresh()
-
-        
-        top_items = menu.list_top_items()
-        self.assertTrue(len(top_items) >= 3)
-        self.assertEquals('aaa', top_items[0].title)
-        self.assertEquals(2, len(top_items[0].children))
-        
-    def test_remove_page(self):        
-        Sitemap.objects.refresh_current_site()
-        sitemap = Sitemap.objects.get(slug='flatpages')
-        menu = Menu.objects.get(pk=1)
-        menu.refresh()
-        
-        # make sure the page exists
-        self.assertEquals(1, len(sitemap.item_set.filter(url='/aaa/bbb/')) )
-        self.assertEquals(1, len(menu.find_items(url='/aaa/bbb/')))
-        
-        # remove the page
-        FlatPage.objects.filter(url='/aaa/bbb/').delete()
-        Sitemap.objects.refresh_current_site()
-        menu = Menu.objects.get(pk=1)
-        
-        # make sure the page doesn't exist
-        self.assertEquals(0, len(sitemap.item_set.filter(url='/aaa/bbb/')) )
-        
-        # make sure menu item is disabled
-        self.assertEquals(1, len(menu.find_items(url='/aaa/bbb/')))
-        self.assertEquals(None, menu.get_item(url='/aaa/bbb/').sitemap_item)
-        self.assertEquals(False, menu.get_item(url='/aaa/bbb/').is_enabled())
-        
-    def test_find_parent_for_url_query(self):        
-        Sitemap.objects.refresh_current_site()
-        sitemap = Sitemap.objects.get(slug='flatpages')
-        
-        sitemap_item = sitemap.find_parent_for_url('/aaa/bbb/text.html?query=1#hash')
-        self.assertNotEqual(None, sitemap_item)
-        self.assertEqual('/aaa/bbb/', sitemap_item.url)
-    
-    def test_find_parent_for_url_path(self):        
-        Sitemap.objects.refresh_current_site()
-        sitemap = Sitemap.objects.get(slug='flatpages')
-        
-        sitemap_item = sitemap.find_parent_for_url('/aaa/bbb/')
-        self.assertNotEqual(None, sitemap_item)
-        self.assertEqual('/aaa/', sitemap_item.url)
-
             
     
         

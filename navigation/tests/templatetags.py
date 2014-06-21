@@ -60,30 +60,34 @@ class MenuTagTest(TestCase):
         info = get_navigation_menu('Top')
         self.assertEquals(0, len(info['items']))
 
-    def test_get_menu_root(self):
-        info = get_navigation_menu( 'Top', root='/second/a.html')
+    def test_get_menu_with_root(self):
+        info = get_navigation_menu( 'Top', root='/bird/duck.html')
         
         self.assertEqual(0, len(info['items']))
         self.assertNotEqual(None, info['parent'])
         self.assertEqual('Top', info['menu'].name)
         
     def test_get_current_items(self):
-        info = get_current_items('Top', '/second')
-        self.assertEqual('Second', info['current_item'].title)
+        info = get_current_items('Top', '/bird/')
+        self.assertEqual('Birds', info['current_item'].title)
         self.assertEqual(None, info['current_parent_item'])
         
     def test_get_current_items_ancestors(self):
-        info = get_current_items('Top', '/second/a.html')
+        info = get_current_items('Top', '/bird/duck.html')
         
-        self.assertEqual('Second A', info['current_item'].title)
+        self.assertEqual('Duck', info['current_item'].title)
         self.assertNotEqual(None, info['current_parent_item'])
-        self.assertEqual('Second', info['current_parent_item'].title)
+        self.assertEqual('Birds', info['current_parent_item'].title)
         self.assertEqual(1, len(info['current_ancestor_items']))
     
 class BreadcrumbsTagTest(TestCase):
     fixtures = ['simple_menus', 'simple_site']
     
 
+    def setUp(self):
+        from navigation.utils import discover_sitemaps
+        discover_sitemaps()
+        
     def test_show(self):
         request = HttpRequest()
         request.path = 'second/a.html'
@@ -105,7 +109,7 @@ class BreadcrumbsTagTest(TestCase):
         self.assertTrue('navigation-breadcrumbs-missing' in menu)
         
     def test_get_breadcrumbs_from_menu(self):
-        request_path = '/second/a.html'
+        request_path = '/bird/duck.html'
         
         crumbs = get_navigation_breadcrumbs(request_path, menu='Top')
         self.assertTrue(crumbs)
@@ -114,7 +118,6 @@ class BreadcrumbsTagTest(TestCase):
         
     def test_get_breadcrumbs_from_sitemap(self):
         manager = SitemapManager(1)
-        manager.refresh_current_site()
         
         request_path = '/about_us'
         

@@ -3,14 +3,16 @@ from django.test import TestCase
 from django.test.client import Client
 
 from navigation.admin import MenuAdmin
-from navigation.models import Menu, Sitemap, SitemapItem
+from navigation.models import Menu, Sitemap
 
     
 
 class MenuAdminTest(TestCase):
     fixtures = ['flatpages']
     
-
+    def setUp(self):
+        from navigation.utils import discover_sitemaps
+        discover_sitemaps()
 
     def test_refresh_items(self):
         from navigation.admin import refresh_items
@@ -18,27 +20,23 @@ class MenuAdminTest(TestCase):
         refresh_items(None, None, queryset)
     
     def test_find_sitemap_items_by_term(self):
-        Sitemap.objects.refresh_current_site()
-        
         client = self._get_admin_client()
-        response = client.get('/admin/navigation/menu/find-sitemap-items/', {'term': 'aaa bbb'})
-        self.assertContains(response, '/aaa/bbb/')
-        self.assertNotContains(response, 'ccc')
+        response = client.get('/admin/navigation/menu/find-sitemap-items/', {'term': 'Goldfish'})
+        self.assertContains(response, '/fishes/goldfish/')
+        self.assertNotContains(response, '/bubble/')
         
-        response = client.get('/admin/navigation/menu/find-sitemap-items/', {'term': 'ccc'})
-        self.assertContains(response, 'ccc')
+        response = client.get('/admin/navigation/menu/find-sitemap-items/', {'term': 'Bubble'})
+        self.assertContains(response, '/bubble/')
     
     def test_find_sitemap_items_by_url(self):
-        Sitemap.objects.refresh_current_site()
-        
         client = self._get_admin_client()
-        response = client.get('/admin/navigation/menu/find-sitemap-items/', {'url': '/aaa/bbb/'})
-        self.assertContains(response, '/aaa/bbb/')
-        self.assertNotContains(response, '/ccc/')
+        response = client.get('/admin/navigation/menu/find-sitemap-items/', {'url': '/fishes/betta/'})
+        self.assertContains(response, '/fishes/betta/')
+        self.assertNotContains(response, '/fishes/goldfish/')
         
-        response = client.get('/admin/navigation/menu/find-sitemap-items/', {'term': '/ccc/'})
-        self.assertContains(response, '/ccc/')
-        self.assertNotContains(response, '/aaa/bbb/')
+        response = client.get('/admin/navigation/menu/find-sitemap-items/', {'url': '/fishes/goldfish/'})
+        self.assertContains(response, '/fishes/goldfish/')
+        self.assertNotContains(response, '/fishes/betta/')
 
             
     def _get_admin_client(self):

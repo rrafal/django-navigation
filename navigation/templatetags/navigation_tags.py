@@ -43,9 +43,7 @@ def show_navigation_menu(context, menu, root=None, template='navigation/menu.htm
 		data['depth'] = context['depth'] + 1
 	else:
 		data['depth'] = 0
-	
-
-	
+		
 	# are we rendering empty submenu
 	if len(data['items']) == 0 and data['depth'] > 0:
 		return '';
@@ -185,26 +183,27 @@ def show_navigation_breadcrumbs(context, menu=None, sitemap=None, request_path=N
 		
 
 def get_navigation_breadcrumbs(current_path, menu=None, sitemap=None):
-
-	items = False
+	
+	
+	# get or create menu for sitemap as needed
+	if menu == None and sitemap:
+		sitemap = Sitemap.current_objects.get(slug=sitemap)
+		try:
+			menu = Menu.current_objects.filter(sitemap=sitemap).get()
+		except ObjectDoesNotExist:
+			# create menu
+			menu = Menu()
+			menu.name = unicode(sitemap)
+			menu.site = sitemap.site
+			menu.sitemap = sitemap
+			menu.save()
+			
+			from navigation.utils import refresh_menu_from_sitemap
+			refresh_menu_from_sitemap(menu, sitemap)
+		
 	
 	# create breadcrumbs from menu
-	if not items and menu != None:
-		try:
-			items = get_breadcrumbs_from_menu(current_path, menu)
-		except ObjectDoesNotExist:
-			pass
-	
-	# create breadcrubs from sitemap
-	if not items and sitemap != None:
-		try:
-			items = get_breadcrumbs_from_sitemap(current_path, sitemap)
-		except ObjectDoesNotExist:
-			pass
-
-	# we must have the menu by now			
-	if items == False:
-		raise ObjectDoesNotExist()
+	items = get_breadcrumbs_from_menu(current_path, menu)
 	
 	if not items:
 		return None
@@ -222,6 +221,7 @@ def get_navigation_breadcrumbs(current_path, menu=None, sitemap=None):
 		
 	items.reverse()
 	return items
+
 
 def get_breadcrumbs_from_menu(current_path, menu):
 	the_menu = None
@@ -244,28 +244,6 @@ def get_breadcrumbs_from_menu(current_path, menu):
 	else:
 		return None
 
-def get_breadcrumbs_from_sitemap(current_path, sitemap):
-	if isinstance(sitemap, Sitemap):
-		the_sitemap = sitemap
-	else:
-		the_sitemap = Sitemap.current_objects.get(slug=sitemap)
-		
-	current_items = the_sitemap.item_set.filter(url=current_path)
-	
-	if len(current_items):
-		breadcrumbs = []
-		sitemap_item = current_items[0]
-		while sitemap_item:
-			menu_item = MenuItem()
-			menu_item.title = sitemap_item.title
-			menu_item.url = sitemap_item.url
-			menu_item.status = sitemap_item.status
-			breadcrumbs.append(menu_item)
-			
-			sitemap_item = sitemap_item.parent
-		return breadcrumbs
-	else:
-		return None
 
 
 def show_missing_menu(context, menu, template):

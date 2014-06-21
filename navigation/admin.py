@@ -7,15 +7,23 @@ from django.views.decorators.http import require_POST, require_safe
 from django.core.exceptions import SuspiciousOperation, ValidationError
 from django.core.urlresolvers import reverse
 
-from navigation.models import Sitemap, SitemapItem, Menu, MenuItem
+from navigation.models import Sitemap, Menu, MenuItem
 
 from django.conf import settings
 
+class SitemapAdmin(admin.ModelAdmin):
+    readonly_fields=('site', 'slug')
+
 @transaction.atomic
 def refresh_items(modeladmin, request, queryset):
-    Sitemap.objects.refresh_current_site()
-    for menu in queryset.all():
-        menu.refresh()
+    from .utils import refresh_menu_from_sitemap
+    
+    for sitemap in Sitemap.current_objects.all():
+        if sitemap.is_available():
+            for menu in queryset.all():
+                if menu.sitemap == None or menu.sitemap == sitemap:
+                    refresh_menu_from_sitemap(menu, sitemap)
+    pass
     
 refresh_items.short_description = "Refresh menu items"
 
@@ -39,15 +47,15 @@ class MenuAdmin(admin.ModelAdmin):
     hidden_fields = ['site']
     
     def changelist_view(self, *args, **kw):
-        self._check_sitemap()
+        self._refresh_sitemaps()
         return super(MenuAdmin, self).changelist_view(*args, **kw)
     
     def change_view(self, *args, **kw):
-        self._check_sitemap()
+        self._refresh_sitemaps()
         return super(MenuAdmin, self).change_view(*args, **kw)
     
     def add_view(self, *args, **kw):
-        self._check_sitemap()
+        self._refresh_sitemaps()
         return super(MenuAdmin, self).add_view(*args, **kw)
     
     def get_form(self, request, obj=None, **kwargs):
@@ -96,8 +104,7 @@ class MenuAdmin(admin.ModelAdmin):
                     item.url = my_url
                     item.order = my_order
                     item.parent = None
-                    if my_sitemap_item_id:
-                        item.sitemap_item = SitemapItem.objects.get(id=my_sitemap_item_id)
+                    item.sitemap_item_id = my_sitemap_item_id
                     item.save()
 
                     id_map[my_id] = item
@@ -121,7 +128,6 @@ class MenuAdmin(admin.ModelAdmin):
                 item.delete()
         
         # done
-        obj.refresh()
         
 
     def show_view(self, request, menu_id):
@@ -146,48 +152,62 @@ class MenuAdmin(admin.ModelAdmin):
 
     @transaction.atomic
     def refresh_view(self, request, menu_id):
-        Sitemap.objects.refresh_current_site()
+        from .utils import refresh_menu_from_sitemap
+    
         menu = Menu.objects.get(pk=menu_id)
-        menu.refresh()
+        
+        if menu.sitemap:
+            refresh_menu_from_sitemap(menu, menu.sitemap)
+        else:
+            for sitemap in Sitemap.current_objects.all():
+                if sitemap.is_available():
+                    refresh_menu_from_sitemap(menu, sitemap)
         
         url = request.build_absolute_uri( reverse('admin:navigation_menu_change', args=[menu.id]) )
         return HttpResponseRedirect(url)    
     
     def find_sitemap_items(self, request):
         import json
-        from .models import SitemapItem
+        from .models import Sitemap
         
-        items = []
+        matches = []
+        
+        sitemap_items = []
+        for sitemap in Sitemap.current_objects.all():
+            if sitemap.is_available():
+                for sitemap_item in sitemap.get_items():
+                    sitemap_items.append(sitemap_item)
+                    
         
         if request.GET.get('url') != None:
-            url = request.GET.get('url')
-            items = SitemapItem.objects.filter(url__iexact=url)
+            url_1 = request.GET.get('url').lower()
+            
+            for item in sitemap_items:
+                if item['location'].lower().startswith( url_1 ):
+                    matches.append( item )
         
         if request.GET.get('term') != None:
-            term = request.GET.get('term')
-            for item in SitemapItem.objects.filter(title__istartswith=term):
-                items.append(item)
-            for item in SitemapItem.objects.filter(url__istartswith=term):
-                items.append(item)
-            url = "/"+term
-            for item in SitemapItem.objects.filter(url__istartswith=url):
-                items.append(item)
+            title_1 = request.GET.get('term').lower()
+            url_1 = request.GET.get('term').lower()
+            url_2 = "/" + request.GET.get('term').lower()
             
-            if not items:
-                for item in SitemapItem.objects.filter(title__icontains=term):
-                    items.append(item)
-                for item in SitemapItem.objects.filter(url__icontains=term):
-                    items.append(item)
+            for item in sitemap_items:
+                if item['title'].lower().startswith( title_1 ):
+                    matches.append( item )
+                elif item['location'].lower().startswith( url_1 ):
+                    matches.append( item )
+                elif item['location'].lower().startswith( url_2 ):
+                    matches.append( item )
+            
+            if not matches:
+                for item in sitemap_items:
+                    if title_1 in item['title'].lower():
+                        matches.append( item )
+                    elif url_1 in item['url'].lower():
+                        matches.append( item )
+            
+        data = matches[:100]
         
-        data = []
-        for item in items:
-            data.append({
-                'id' : item.id,
-                'uuid' : item.uuid,
-                'title' : item.title,
-                'url' : item.url,
-                'status' : item.status,
-                })
         return HttpResponse(json.dumps(data), content_type="application/json")
     
     def _serialize_menu_item(self, item):
@@ -205,21 +225,22 @@ class MenuAdmin(admin.ModelAdmin):
         if item.parent:
             data['parent_id'] = item.parent.id
         
-        if item.sitemap_item:
-            data['sitemap_item_id'] = item.sitemap_item.id
-            data['sitemap_item_title'] = item.sitemap_item.title
-            data['sitemap_item_status'] = item.sitemap_item.status
+        if item.sitemap_item_id:
+            data['sitemap_item_id'] = item.sitemap_item_id
+            data['sitemap_item_title'] = item.sitemap_item_title
+            data['sitemap_item_status'] = item.sitemap_item_status
             
         return data
     
-    def _check_sitemap(self):
+    def _refresh_sitemaps(self):
         ''' Discover sitemaps if there are none yet,
         If sitemap already exists, user has to request refresh manually '''
-        if Sitemap.current_objects.count() == 0:
-            Sitemap.current_objects.refresh_current_site()
+        from .utils import discover_sitemaps
+        discover_sitemaps()
             
    
 admin.site.register(Menu, MenuAdmin)
+admin.site.register(Sitemap, SitemapAdmin)
 
 
 if getattr(settings, 'NAVIGATION_AUTO_REFRESH', False):

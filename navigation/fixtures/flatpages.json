@@ -32,8 +32,8 @@
         "pk": 20,
         "model": "flatpages.flatpage",
         "fields": {
-            "title": "aaa",
-            "url" : "/aaa/",
+            "title": "Fishes",
+            "url" : "/fishes/",
             "sites" : [1]
         }
     },
@@ -42,8 +42,8 @@
         "pk": 21,
         "model": "flatpages.flatpage",
         "fields": {
-            "title": "bbb",
-            "url" : "/bbb/",
+            "title": "Birds",
+            "url" : "/birds/",
             "sites" : [1]
         }
     },
@@ -52,8 +52,8 @@
         "pk": 22,
         "model": "flatpages.flatpage",
         "fields": {
-            "title": "ccc",
-            "url" : "/ccc/",
+            "title": "Reptiles",
+            "url" : "/reptiles/",
             "sites" : [1]
         }
     },
@@ -62,8 +62,8 @@
         "pk": 23,
         "model": "flatpages.flatpage",
         "fields": {
-            "title": "aaa bbb",
-            "url" : "/aaa/bbb/",
+            "title": "Betta",
+            "url" : "/fishes/betta/",
             "sites" : [1]
         }
     },
@@ -72,8 +72,8 @@
         "pk": 24,
         "model": "flatpages.flatpage",
         "fields": {
-            "title": "aaa ccc",
-            "url" : "/aaa/ccc/",
+            "title": "Goldfish",
+            "url" : "/fishes/goldfish/",
             "sites" : [1]
         }
     },
@@ -82,8 +82,8 @@
         "pk": 25,
         "model": "flatpages.flatpage",
         "fields": {
-            "title": "aaa ccc ddd",
-            "url" : "/aaa/ccc/ddd/",
+            "title": "Bubble",
+            "url" : "/fishes/goldfish/bubble/",
             "sites" : [1]
         }
     }   

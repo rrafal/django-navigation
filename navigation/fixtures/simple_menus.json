@@ -22,8 +22,8 @@
         "model": "navigation.menuitem",
         "fields": {
             "menu": 1,
-            "title" : "First",
-            "url": "/first"
+            "title" : "Fishs",
+            "url": "/fish/"
         }
     },
     
@@ -32,8 +32,8 @@
         "model": "navigation.menuitem",
         "fields": {
             "menu": 1,
-            "title" : "Second",
-            "url": "/second"
+            "title" : "Birds",
+            "url": "/bird/"
         }
     },
     
@@ -42,9 +42,9 @@
         "model": "navigation.menuitem",
         "fields": {
             "menu": 1,
-            "url": "/second/a.html",
+            "url": "/bird/duck.html",
             "my_parent": 12,
-            "title" : "Second A"
+            "title" : "Duck"
         }
     }
 ]

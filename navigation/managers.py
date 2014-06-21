@@ -34,21 +34,7 @@ class SiteModelManager(models.Manager):
 
 
 class SitemapManager(SiteModelManager):
-    def refresh_current_site(self):
-        from navigation.models import Sitemap
-        
-        site = Site.objects.get_current()
-        for sitemap_info in get_sitemap_info_list():
-            try:
-                sitemap = Sitemap.objects.filter(site=site, slug=sitemap_info.slug).get()
-            except ObjectDoesNotExist:
-                sitemap = Sitemap()
-                sitemap.site = site
-                
-            sitemap.slug = sitemap_info.slug
-            sitemap.save()
-            sitemap.refresh()
-        pass
+    pass
         
 class MenuManager(SiteModelManager):
     pass

@@ -10,6 +10,9 @@ def home(request):
 @transaction.atomic
 def setup(request):
 	from django.contrib.sites.models import Site
+	from navigation.utils import discover_sitemaps, refresh_all_menus
+	
+	discover_sitemaps()
 	
 	if Page.objects.count() == 0:
 		home_page = _create_page("Life", None)
@@ -38,14 +41,15 @@ def setup(request):
 		_create_page("Cod", fishes_page)
 		_create_page("Goldfish", fishes_page)
 		
-	Sitemap.objects.refresh_current_site()
 	
 	if Menu.objects.filter(name='Main Menu').count() == 0:
 		menu = Menu(name='Main Menu')
 		menu.site = Site.objects.get_current()
 		menu.sitemap = Sitemap.objects.get(slug='cms-pages')
 		menu.save()
-		menu.refresh()
+		
+	
+	refresh_all_menus()
 	
 	return render(request, 'example/setup.html', {}) 
 
