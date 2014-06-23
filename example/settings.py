@@ -64,8 +64,8 @@ MEDIA_URL = '/media/'
 
 
 NAVIGATION_SITEMAPS = (
-    'navigation.utils.FlatPageSitemapInfo',
-    'navigation.utils.CMSSitemapInfo',
+    'navigation.sitemaps.FlatPageSitemapInfo',
+    'navigation.sitemaps.CMSSitemapInfo',
 )
 NAVIGATION_AUTO_REFRESH = True
             
