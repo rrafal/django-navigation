@@ -10,7 +10,6 @@
 	padding: 0;
 }
 .navigation-menu .navigation-menu-item {
-	position: relative;
 	margin: 0;
 	padding: 0;
 }
@@ -19,6 +18,7 @@
 	display: block;
 	text-decoration: none;
 	padding: 5px 20px;
+	white-space: nowrap;
 }
 .navigation-menu .navigation-menu-item:hover > a {
 	background: #eee;
@@ -38,6 +38,7 @@
 
 /* Menu first level*/
 .navigation-menu > .navigation-menu-item {
+	position: relative;
 	float: left;
 	margin-right: 10px;
 }
@@ -60,7 +61,7 @@
 /* Menu 3+ sublevel */
 .navigation-menu .navigation-submenu > .navigation-menu-item > .navigation-submenu {
 	position: absolute;
-	top: 0;
+	top: -1px;
 	left: 100%;
 }
 
@@ -73,7 +74,7 @@
 /** Sidebar **/
 #site-sidebar {
 	float: right;
-	width: 200px;
+	width: 300px;
 	margin-bottom: 40px;
 }
 #site-sidebar .navigation-menu-item > a {
