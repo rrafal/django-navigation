@@ -108,7 +108,7 @@ def get_navigation_menu(menu, root=None):
 		the_items = this.children
 		
 	the_items = [item for item in the_items if item.is_enabled()]
-		
+	
 	# done
 	return {
 		'items' : the_items,

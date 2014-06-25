@@ -4,7 +4,6 @@ from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.db import models
 from django.utils.importlib import import_module
 from django.utils.translation import pgettext
- 
 
 def discover_sitemaps():
     from django.contrib.sites.models import Site
@@ -22,6 +21,9 @@ def initialize_autorefresh():
         from navigation.models import Sitemap, Menu
         from django.contrib.sites.models import Site
         
+        if not getattr(settings, 'NAVIGATION_AUTO_REFRESH', False):
+            return False
+
         discover_sitemaps()
         for sitemap in Sitemap.current_objects.filter(slug=info.slug):
             for menu in Menu.current_objects.all():
@@ -101,7 +103,10 @@ def _refresh_menu_from_sitemap_items(menu, sitemap):
     
     for sitemap_item in sitemap.get_items():
         for menu_item in get_menu_items_for_sitemap_item(sitemap_item):
-            menu_item.sitemap_item_status = sitemap_item.get('status', 'active')
+            if sitemap_item.get('enabled', True):
+                menu_item.sitemap_item_status = 'enabled'
+            else:
+                menu_item.sitemap_item_status = 'disabled'
             
             if not menu_item.title or menu_item.sitemap_item_title == menu_item.title:
                 menu_item.title = sitemap_item.get('title', '')
@@ -171,7 +176,10 @@ def _refresh_menu_from_sitemap_full(menu, sitemap):
             menu_item.title = s.get('title', '')
                 
         menu_item.sitemap_item_title = s.get('title', '')
-        menu_item.sitemap_item_status = s.get('status', 'active')
+        if s.get('enabled', True):
+            menu_item.sitemap_item_status = 'enabled'
+        else:
+            menu_item.sitemap_item_status = 'disabled'
         menu_item.url = s.get('location', '')
         menu_item.order = s.get('order', 1)  
         menu_item.save()
