@@ -127,7 +127,7 @@ def _refresh_menu_from_sitemap_full(menu, sitemap):
     
     # check if menu should be empty
     if not sitemap_items:
-        menu.menuitem_set.clear()
+        menu.menuitem_set.all().delete()
         return
     
     sitemap_has_tree = 'parent' in sitemap_items[0]

@@ -28,7 +28,7 @@ class RefreshTest(TestCase):
         birds_item = filter(lambda i: i.sitemap_item_title == 'Birds', menu.list_all_items())[0]
         self.assertEquals('Birds', birds_item.title)
         self.assertEquals('/birds/', birds_item.url)
-        self.assertEquals('active', birds_item.sitemap_item_status)
+        self.assertEquals('enabled', birds_item.sitemap_item_status)
         self.assertIsNotNone(birds_item.sitemap_item_id)
         
     def test_refresh_menu_from_sitemap__update_page(self):
@@ -71,8 +71,11 @@ class RefreshTest(TestCase):
             {'uuid' : 'child', 'title': 'Child', 'location':'/child/', 'parent': '/'},
             ]
         sitemap.get_items = MagicMock(return_value=items)
-        
         refresh_menu_from_sitemap(menu, sitemap)
+        
+        # check
+        menu_item = MenuItem.objects.filter(title='Child').get()
+        self.assertNotEquals(None, menu_item.parent)
         
         # modify
         items[1]['parent'] = None
@@ -85,4 +88,29 @@ class RefreshTest(TestCase):
         menu_item = MenuItem.objects.filter(title='Child').get()
         self.assertEquals(None, menu_item.parent)
         
+    
+    def test_refresh_menu_from_sitemap__empty_menu(self):        
+        from navigation.models import Menu, MenuItem, Sitemap
+        from navigation.utils import refresh_menu_from_sitemap
+        from mock import MagicMock
+
+        sitemap = Sitemap.objects.get(slug='flatpages')
+        menu = Menu.objects.get(sitemap=sitemap)
         
+        # initialize
+        items = [
+            {'uuid' : 'home', 'title': 'Home', 'location':'/', 'parent': None},
+            {'uuid' : 'child', 'title': 'Child', 'location':'/child/', 'parent': '/'},
+            ]
+        sitemap.get_items = MagicMock(return_value=items)
+        refresh_menu_from_sitemap(menu, sitemap)
+        
+        # modify
+        items[1]['parent'] = None
+        sitemap.get_items = MagicMock(return_value=[])
+        
+        # refresh
+        refresh_menu_from_sitemap(menu, sitemap)
+        
+        # check
+        self.assertEquals(0, MenuItem.objects.filter(title='Child').count())
