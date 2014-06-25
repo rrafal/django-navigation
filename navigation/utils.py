@@ -97,12 +97,13 @@ def refresh_menu_from_sitemap(menu, sitemap):
     
 def _refresh_menu_from_sitemap_items(menu, sitemap):
     ''' Refreshes items that belong to give sitemap '''
-    
+    print "_refresh_menu_from_sitemap_items"
     def get_menu_items_for_sitemap_item(sitemap_item):
         return menu.menuitem_set.filter(sitemap=sitemap, sitemap_item_id=sitemap_item['uuid'])
     
     for sitemap_item in sitemap.get_items():
         for menu_item in get_menu_items_for_sitemap_item(sitemap_item):
+            print(sitemap_item.get('enabled'))
             if sitemap_item.get('enabled', True):
                 menu_item.sitemap_item_status = 'enabled'
             else:
@@ -160,6 +161,9 @@ def _refresh_menu_from_sitemap_full(menu, sitemap):
     for menu_item in menu.menuitem_set.all():
         menu_item.parent = None
         menu_item.save()
+        
+    # remove items from other sitemaps
+    menu.menuitem_set.exclude(sitemap=sitemap).delete()
     
     # create new items and update existing items
     current_menu_items = set()
@@ -170,6 +174,7 @@ def _refresh_menu_from_sitemap_full(menu, sitemap):
             menu_item = MenuItem()
             menu_item.menu = menu
             menu_item.status = 'auto'
+            menu_item.sitemap = sitemap
             menu_item.sitemap_item_id = s['uuid']
         
         if not menu_item.title or menu_item.sitemap_item_title == menu_item.title:
