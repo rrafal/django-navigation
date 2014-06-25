@@ -69,7 +69,7 @@ class Menu(models.Model):
     '''
     
     site = models.ForeignKey('sites.site')
-    sitemap = models.ForeignKey(Sitemap, null=True, related_name='menus')
+    sitemap = models.ForeignKey(Sitemap, null=True, blank=True, related_name='menus')
     name = models.CharField(_('Name'), max_length=255)
     all_items = None
     
