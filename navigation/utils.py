@@ -151,14 +151,14 @@ def _refresh_menu_from_sitemap_full(menu, sitemap):
             parent_url = get_parent_url(parent_url)
         return None
     
-    
     # flatten menu
     for menu_item in menu.menuitem_set.all():
-        menu_item.set_parent(None)
+        menu_item.parent = None
+        menu_item.save()
     
     # create new items and update existing items
     current_menu_items = set()
-    for s in sitemap_items:            
+    for s in sitemap_items:
         try:
             menu_item = menu.menuitem_set.filter(sitemap_item_id=s['uuid']).get()
         except ObjectDoesNotExist:
@@ -168,7 +168,7 @@ def _refresh_menu_from_sitemap_full(menu, sitemap):
             menu_item.sitemap_item_id = s['uuid']
         
         if not menu_item.title or menu_item.sitemap_item_title == menu_item.title:
-             menu_item.title = s.get('title', '')
+            menu_item.title = s.get('title', '')
                 
         menu_item.sitemap_item_title = s.get('title', '')
         menu_item.sitemap_item_status = s.get('status', 'active')
@@ -185,7 +185,7 @@ def _refresh_menu_from_sitemap_full(menu, sitemap):
     
     # create hierarchy
     if sitemap_has_tree:
-        for s in sitemap_items:
+        for s in (s for s in sitemap_items if s['parent']):
             try:
                 menu_item = menu.menuitem_set.filter(sitemap_item_id=s['uuid']).get()
                 parent_item = menu.menuitem_set.filter(url=s['parent']).get()
@@ -212,7 +212,8 @@ def _refresh_menu_from_sitemap_full(menu, sitemap):
         for index, menu_item in enumerate(menu.menuitem_set.order_by('title')):
             menu_item.order = index
             menu_item.save()
-    
+            
+    menu.clean_item_order()
     
 def get_parent_url(url):
     from urlparse import urlsplit, urldefrag, urljoin

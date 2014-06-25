@@ -1,4 +1,7 @@
 from django.test import TestCase
+from navigation.sitemaps import AbstractSitemapInfo
+    
+
     
 class RefreshTest(TestCase):
     fixtures = ['flatpages']
@@ -54,7 +57,32 @@ class RefreshTest(TestCase):
         self.assertEquals(0, MenuItem.objects.filter(url='/birds/').count())
         self.assertEquals(1, MenuItem.objects.filter(url='/nice-birds/').count())
     
+    def test_refresh_menu_from_sitemap__update_page_parent(self):        
+        from navigation.models import Menu, MenuItem, Sitemap
+        from navigation.utils import refresh_menu_from_sitemap
+        from mock import MagicMock
 
+        sitemap = Sitemap.objects.get(slug='flatpages')
+        menu = Menu.objects.get(sitemap=sitemap)
         
+        # initialize
+        items = [
+            {'uuid' : 'home', 'title': 'Home', 'location':'/', 'parent': None},
+            {'uuid' : 'child', 'title': 'Child', 'location':'/child/', 'parent': '/'},
+            ]
+        sitemap.get_items = MagicMock(return_value=items)
+        
+        refresh_menu_from_sitemap(menu, sitemap)
+        
+        # modify
+        items[1]['parent'] = None
+        sitemap.get_items = MagicMock(return_value=items)
+        
+        # refresh
+        refresh_menu_from_sitemap(menu, sitemap)
+        
+        # check
+        menu_item = MenuItem.objects.filter(title='Child').get()
+        self.assertEquals(None, menu_item.parent)
         
         

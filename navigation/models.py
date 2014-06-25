@@ -119,6 +119,32 @@ class Menu(models.Model):
                 i.menu = self
                 self.all_items.append(i)
     
+    def clean_item_order(self):
+        self.all_items = None
+        
+        # sort items in depth-first order
+        def get_sorted_descendents(all_items, parent):
+            for item in all_items:
+                if item.my_parent_id == parent.id:
+                    yield item
+                    for descendent in get_sorted_descendents(all_items, item):
+                        yield descendent
+            pass
+        def get_sorted(all_items):
+            all_items = list(all_items)
+            for item in all_items:
+                if item.my_parent_id == None:
+                    yield item
+                    for descendent in get_sorted_descendents(all_items, item):
+                        yield descendent
+            pass
+
+        all_items = self.menuitem_set.order_by('order').all()
+        for index, item in enumerate(get_sorted(all_items)):
+            item.order = index
+            item.save()
+        
+    
     def save(self, *args, **kwargs):
         # Call the "real" save() method.
         super(Menu, self).save(*args, **kwargs)
