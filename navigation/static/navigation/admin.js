@@ -37,9 +37,12 @@ django.navigation.init_items_editor = function(options){
 			type: 'GET',
 			url: location.pathname + "view/",
 			success: function(data){
+				// hiding the tree during editing to improve performance
+				$tree.hide();
 				$(data['items']).each(function(index, info){
 					render_item(info);
 				})
+				$tree.show();
 			}
     	});
 		
