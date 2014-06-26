@@ -162,7 +162,7 @@ class MenuItem(models.Model):
         ('disabled', 'Disabled'),
         )
 
-    my_parent = models.ForeignKey('self', db_column='parent_id', verbose_name=_('Parent'), null=True, blank=True)
+    my_parent = models.ForeignKey('self', db_column='parent_id', verbose_name=_('Parent'), related_name='+', null=True, blank=True)
     
     menu = models.ForeignKey(Menu)
     title = models.CharField(max_length=255)

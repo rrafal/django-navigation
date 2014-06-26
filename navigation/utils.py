@@ -90,20 +90,24 @@ def refresh_all_menus():
     
 def refresh_menu_from_sitemap(menu, sitemap):
     ''' Refreshes menu items based on changes in sitemap. '''
+    
     if menu.sitemap == sitemap:
         _refresh_menu_from_sitemap_full(menu, sitemap)
     else:
         _refresh_menu_from_sitemap_items(menu, sitemap)
+        
+    menu.clean_item_order()
     
 def _refresh_menu_from_sitemap_items(menu, sitemap):
     ''' Refreshes items that belong to give sitemap '''
-    print "_refresh_menu_from_sitemap_items"
     def get_menu_items_for_sitemap_item(sitemap_item):
         return menu.menuitem_set.filter(sitemap=sitemap, sitemap_item_id=sitemap_item['uuid'])
     
+    current_menu_items = set()
+    
+    # update items belonging to this sitemap
     for sitemap_item in sitemap.get_items():
         for menu_item in get_menu_items_for_sitemap_item(sitemap_item):
-            print(sitemap_item.get('enabled'))
             if sitemap_item.get('enabled', True):
                 menu_item.sitemap_item_status = 'enabled'
             else:
@@ -118,7 +122,27 @@ def _refresh_menu_from_sitemap_items(menu, sitemap):
                 menu_item.url = sitemap_item['location']
             
             menu_item.save()
+            current_menu_items.add(menu_item)
     
+    # deleted items to pages that don't exist any longer
+    items_to_delete = set()
+    for item in menu.menuitem_set.filter(sitemap=sitemap):
+        if item not in current_menu_items:
+            items_to_delete.add(item)
+            
+    for item in items_to_delete:
+        # flatten menu as needed
+        for child in menu.menuitem_set.filter(my_parent=item):
+            if item.parent in items_to_delete:
+                child.parent = None
+            else:
+                child.parent = item.parent
+            child.save()
+    
+    for item in items_to_delete:
+        item.delete()
+    
+            
 def _refresh_menu_from_sitemap_full(menu, sitemap):
     ''' Refreshes entire menu based on a sitemap. '''
     from .models import MenuItem
@@ -225,8 +249,6 @@ def _refresh_menu_from_sitemap_full(menu, sitemap):
         for index, menu_item in enumerate(menu.menuitem_set.order_by('title')):
             menu_item.order = index
             menu_item.save()
-            
-    menu.clean_item_order()
     
 def get_parent_url(url):
     from urlparse import urlsplit, urldefrag, urljoin

@@ -114,3 +114,75 @@ class RefreshTest(TestCase):
         
         # check
         self.assertEquals(0, MenuItem.objects.filter(title='Child').count())
+
+    def test_refresh_menu_from_sitemap__remove_some_pages(self):
+        ''' Menu item knows what page it belongs to. It should be deleted
+        when its page is deleted. '''
+        from navigation.models import Menu, MenuItem, Sitemap
+        from navigation.utils import refresh_menu_from_sitemap
+        from mock import MagicMock
+        
+        sitemap = Sitemap.objects.get(slug='flatpages')
+        menu = Menu.objects.get(sitemap=sitemap)
+        
+        # initialize
+        items_4 = [
+            {'uuid' : 'home', 'title': 'Home', 'location':'/', 'parent': None},
+            {'uuid' : 'child', 'title': 'Child', 'location':'/child/', 'parent': '/'},
+            {'uuid' : 'grandchild', 'title': 'Grandchild', 'location':'/child/grandchild/', 'parent': '/child/'},
+            {'uuid' : 'grandgrandchild', 'title': 'Grandchild', 'location':'/child/grandchild/grandgrandchild/', 'parent': '/child/grandchild/'},
+            ]
+        sitemap.get_items = MagicMock(return_value=items_4)
+        refresh_menu_from_sitemap(menu, sitemap)
+        
+        # check
+        self.assertEquals(4, len(menu.list_all_items()))
+        
+        # unattache sitemap from menu
+        menu.sitemap = None
+        menu.save()
+        
+        # remove page
+        items_1 = [
+            {'uuid' : 'child', 'title': 'Child', 'location':'/'},
+            ]
+        sitemap.get_items = MagicMock(return_value=items_1)
+        refresh_menu_from_sitemap(menu, sitemap)
+        
+        # check
+        self.assertEquals(1, len(menu.list_all_items()))
+    
+    def test_refresh_menu_from_sitemap__remove_all_pages(self):
+        ''' Menu item knows what page it belongs to. It should be deleted
+        when its page is deleted. '''
+        from navigation.models import Menu, MenuItem, Sitemap
+        from navigation.utils import refresh_menu_from_sitemap
+        from mock import MagicMock
+        
+        sitemap = Sitemap.objects.get(slug='flatpages')
+        menu = Menu.objects.get(sitemap=sitemap)
+        
+        # initialize
+        items_4 = [
+            {'uuid' : 'home', 'title': 'Home', 'location':'/', 'parent': None},
+            {'uuid' : 'child', 'title': 'Child', 'location':'/child/', 'parent': '/'},
+            {'uuid' : 'grandchild', 'title': 'Grandchild', 'location':'/child/grandchild/', 'parent': '/child/'},
+            {'uuid' : 'grandgrandchild', 'title': 'Grandchild', 'location':'/child/grandchild/grandgrandchild/', 'parent': '/child/grandchild/'},
+            ]
+        sitemap.get_items = MagicMock(return_value=items_4)
+        refresh_menu_from_sitemap(menu, sitemap)
+        
+        # check
+        self.assertEquals(4, len(menu.list_all_items()))
+        
+        # unattache sitemap from menu
+        menu.sitemap = None
+        menu.save()
+        
+        # remove pages
+        sitemap.get_items = MagicMock(return_value=[])
+        refresh_menu_from_sitemap(menu, sitemap)
+        
+        # check
+        self.assertEquals(0, len(menu.list_all_items()))
+        
