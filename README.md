@@ -1,7 +1,7 @@
 # django-navigation
 
 
-Creates navigation menus and breadcrumbs.
+django-navigation is a dedicated app for creating menus and breadcrumbs. I believe that Django needs and deserves a dedicated navigation app such as this one. It is independent of other apps that generate your website pages, it works across app boundaries and it's easily customizable (using templates). Read [our wiki](github.com/rrafal/django-navigation/wiki) to learn more how django-navigation can help you.
 
 ### Features
 
