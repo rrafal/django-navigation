@@ -1,0 +1,5 @@
+
+include README.md
+recursive-include navigation *.html
+recursive-include navigation *.css
+recursive-include navigation *.js
