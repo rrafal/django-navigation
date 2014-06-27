@@ -42,9 +42,10 @@ Bellow is a sample template that you can use to display flatpages.
 
 ## Installation
 
-1. Edit settings.py
-2. Add 'navigation' to INSTALLED_APPS
-3. Add NAVIGATION_SITEMAPS. You can add following entries:
+1. `pip install git+https://github.com/rrafal/django-navigation.git`
+2. Edit settings.py
+3. Add 'navigation' to INSTALLED_APPS
+4. Add NAVIGATION_SITEMAPS. You can add following entries:
   - 'navigation.base.FlatPageSitemapInfo'
   - 'navigation.base.CMSSitemapInfo'
 
