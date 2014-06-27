@@ -15,6 +15,8 @@ django-navigation is a dedicated app for creating menus and breadcrumbs. I belie
 
 ### Example
 
+![ScreenShot](https://raw.githubusercontent.com/rrafal/django-navigation/master/screenshots/website-menu.png)
+
 Bellow is a sample template that you can use to display flatpages. 
 
     {% load navigation_tags %}
