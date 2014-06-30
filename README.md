@@ -5,10 +5,11 @@ django-navigation is a dedicated app for creating menus and breadcrumbs. I belie
 
 ### Features
 
+ - use django admin for editing menus
  - flatpages, and django-cms support out of the box
  - auto-generated menus
  - custom menus
- - auto-generated breadcrumbs
+ - breadcrumbs
  - select current navigation item
  - display part of a menu
 
